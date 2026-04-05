@@ -1,0 +1,88 @@
+import { useMemo, useState } from "react"
+import CommentCard from "./CommentCard"
+import { FALLBACK_AVATAR } from "../api/videos"
+
+export default function CommentSection({
+	comments = [],
+	currentUser = null,
+	onAddComment,
+	onEditComment,
+	onDeleteComment,
+}) {
+	const [draftComment, setDraftComment] = useState("")
+
+	const commentCountLabel = useMemo(() => {
+		const totalComments = comments.length
+		return `${totalComments} Comment${totalComments === 1 ? "" : "s"}`
+	}, [comments])
+
+	const handleAddComment = () => {
+		const trimmedComment = draftComment.trim()
+		if (!trimmedComment) return
+
+		onAddComment?.(trimmedComment)
+		setDraftComment("")
+	}
+
+	return (
+		<section className="mx-auto w-full max-w-[960px] px-3 py-6 xxs:px-4 sm:px-5">
+			<div className="mb-4">
+				<h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+					{commentCountLabel}
+				</h2>
+			</div>
+
+			<div className="mb-6 flex gap-3">
+				<div className="h-10 w-10 shrink-0 overflow-hidden rounded-full bg-gray-300 dark:bg-gray-700">
+					<img
+						src={currentUser?.avatar || FALLBACK_AVATAR}
+						alt={currentUser?.username || "Current user avatar"}
+						onError={(event) => {
+							event.currentTarget.src = FALLBACK_AVATAR
+						}}
+						className="h-full w-full object-cover"
+					/>
+				</div>
+
+				<div className="min-w-0 flex-1 space-y-3">
+					<textarea
+						value={draftComment}
+						onChange={(event) => setDraftComment(event.target.value)}
+						rows={3}
+						placeholder="Add a comment..."
+						className="w-full rounded-2xl border border-gray-300 bg-white px-4 py-3 text-sm text-gray-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 dark:border-gray-700 dark:bg-[#181818] dark:text-gray-100 dark:focus:border-blue-400 dark:focus:ring-blue-950"
+					/>
+					<div className="flex justify-end">
+						<button
+							type="button"
+							onClick={handleAddComment}
+							disabled={!draftComment.trim()}
+							className="rounded-full bg-gray-900 px-5 py-2 text-sm font-medium text-white transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-white dark:text-[#121212] dark:hover:bg-gray-200"
+						>
+							Add comment
+						</button>
+					</div>
+				</div>
+			</div>
+
+			<div className="space-y-4">
+				{comments.length > 0 ? (
+					comments.map((comment) => (
+						<CommentCard
+							key={comment.id || comment._id}
+							comment={comment}
+							canManage={currentUser?._id === comment?.user?._id}
+							onEdit={onEditComment}
+							onDelete={onDeleteComment}
+						/>
+					))
+				) : (
+					<div className="rounded-2xl bg-white px-4 py-6 text-sm text-gray-500 shadow-sm dark:bg-[#181818] dark:text-gray-400">
+						No comments yet. Start the conversation.
+					</div>
+				)}
+			</div>
+		</section>
+	)
+}
+
