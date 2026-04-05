@@ -40,47 +40,47 @@ Track every task before submission. Check off each item as it is completed.
 
 ### Register Page (`/register`)
 
-- [ ] Form with Username, Email, and Password fields
-- [ ] Inline validation errors shown for:
-  - [ ] Empty fields
-  - [ ] Invalid email format
-  - [ ] Password shorter than 6 characters
-  - [ ] Username shorter than 3 characters
-- [ ] Successful registration redirects to `/login`
-- [ ] Error from API (e.g., email already taken) shown to user
+- [✅] Form with Username, Email, and Password fields
+- [✅] Inline validation errors shown for:
+  - [✅] Empty fields
+  - [✅] Invalid email format
+  - [✅] Password shorter than 6 characters
+  - [✅] Username shorter than 3 characters
+- [✅] Successful registration redirects to `/login`
+- [✅] Error from API (e.g., email already taken) shown to user
 
 ### Login Page (`/login`)
 
-- [ ] Form with Email and Password fields
-- [ ] Inline validation errors shown
-- [ ] On success: JWT stored in `localStorage`, user state updated
-- [ ] On success: redirect to Home page
-- [ ] Error from API shown to user (wrong credentials, etc.)
+- [✅] Form with Email and Password fields
+- [✅] Inline validation errors shown
+- [✅] On success: JWT stored in `localStorage`, user state updated
+- [✅] On success: redirect to Home page
+- [✅] Error from API shown to user (wrong credentials, etc.)
 
 ### Header Auth State
 
-- [ ] **Before login**: "Sign In" button visible in Header
-- [ ] "Sign In" button navigates to `/login`
-- [ ] **After login**: Username or avatar shown in Header (Sign In button hidden)
-- [ ] Logout option available (clears token, resets state, returns to Home)
+- [✅] **Before login**: "Sign In" button visible in Header
+- [✅] "Sign In" button navigates to `/login`
+- [✅] **After login**: Username or avatar shown in Header (Sign In button hidden)
+- [✅] Logout option available (clears token, resets state, returns to Home)
 
 ### Auth Context
 
-- [ ] `AuthContext.jsx` created
-- [ ] `user`, `login()`, `logout()`, `isAuthenticated` provided
-- [ ] JWT decoded on app load if token already in `localStorage`
+- [✅] `AuthContext.jsx` created
+- [✅] `user`, `login()`, `logout()`, `isAuthenticated` provided
+- [✅] JWT decoded on app load if token already in `localStorage`
 
 ---
 
 ## 🔍 Search & Filter
 
-- [ ] Search bar present in Header
-- [ ] Typing in search bar filters the video grid by **title** (case-insensitive)
-- [ ] Search clears when input is emptied
-- [ ] At least 6 category filter buttons on Home page
-- [ ] Clicking a category filters videos by that category
-- [ ] `All` button resets filter and shows all videos
-- [ ] Search and category filter can work together
+- [✅] Search bar present in Header
+- [✅] Typing in search bar filters the video grid by **title** (case-insensitive)
+- [✅] Search clears when input is emptied
+- [✅] At least 6 category filter buttons on Home page
+- [✅] Clicking a category filters videos by that category
+- [✅] `All` button resets filter and shows all videos
+- [✅] Search and category filter can work together
 
 ---
 

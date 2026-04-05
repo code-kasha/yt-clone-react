@@ -13,13 +13,15 @@ export default function Home() {
 		loading,
 		hasMore,
 		error,
+		searchQuery,
 		handleCategoryChange,
+		handleSearchChange,
 		handleLoadMore,
 	} = useHomeVideos()
 
 	return (
 		<div className="flex h-screen flex-col bg-white dark:bg-[#0f0f0f]">
-			<Header />
+			<Header searchQuery={searchQuery} onSearchChange={handleSearchChange} />
 
 			<div className="flex flex-1 overflow-hidden">
 				<Sidebar />

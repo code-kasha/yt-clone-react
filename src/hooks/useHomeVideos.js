@@ -6,19 +6,32 @@ const filterVideosByCategory = (videos, category) => {
 	return videos.filter((video) => video.category === category)
 }
 
+const filterVideosBySearch = (videos, query) => {
+	const normalizedQuery = query.trim().toLowerCase()
+	if (!normalizedQuery) return videos
+
+	return videos.filter((video) =>
+		video.title?.toLowerCase().includes(normalizedQuery),
+	)
+}
+
+const applyFilters = (videos, category, query) =>
+	filterVideosBySearch(filterVideosByCategory(videos, category), query)
+
 const dedupeVideos = (videos) =>
 	Array.from(new Map(videos.map((video) => [video.id, video])).values())
 
 export default function useHomeVideos() {
 	const [allVideos, setAllVideos] = useState([])
-	const [visibleVideos, setVisibleVideos] = useState([])
 	const [activeCategory, setActiveCategory] = useState("All")
+	const [searchQuery, setSearchQuery] = useState("")
 	const [loading, setLoading] = useState(true)
 	const [hasMore, setHasMore] = useState(true)
 	const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
 	const [error, setError] = useState("")
+	const [visibleVideos, setVisibleVideos] = useState([])
 
-	const refreshVideos = useCallback((category = activeCategory) => {
+	const refreshVideos = useCallback(() => {
 		setLoading(true)
 		setError("")
 
@@ -28,41 +41,42 @@ export default function useHomeVideos() {
 					? data.videos.map(normalizeVideo)
 					: []
 				const uniqueVideos = dedupeVideos(fetchedVideos)
-				const nextFilteredVideos = filterVideosByCategory(uniqueVideos, category)
 
 				setAllVideos(uniqueVideos)
-				setVisibleCount(PAGE_SIZE)
-				setVisibleVideos(nextFilteredVideos.slice(0, PAGE_SIZE))
-				setHasMore(nextFilteredVideos.length > PAGE_SIZE)
 			})
 			.catch((fetchError) => {
 				console.error("Failed to fetch videos", fetchError)
 				setAllVideos([])
-				setVisibleVideos([])
 				setError("Could not load videos from the API.")
-				setHasMore(false)
 			})
 			.finally(() => {
 				setLoading(false)
 			})
-	}, [activeCategory])
+	}, [])
 
 	useEffect(() => {
-		refreshVideos(activeCategory)
-	}, [activeCategory, refreshVideos])
+		refreshVideos()
+	}, [refreshVideos])
+
+	useEffect(() => {
+		const filteredVideos = applyFilters(allVideos, activeCategory, searchQuery)
+		setVisibleVideos(filteredVideos.slice(0, visibleCount))
+		setHasMore(filteredVideos.length > visibleCount)
+	}, [activeCategory, allVideos, searchQuery, visibleCount])
 
 	const handleCategoryChange = (category) => {
 		if (category === activeCategory) return
 		setActiveCategory(category)
-		setLoading(true)
+		setVisibleCount(PAGE_SIZE)
+	}
+
+	const handleSearchChange = (query) => {
+		setSearchQuery(query)
+		setVisibleCount(PAGE_SIZE)
 	}
 
 	const handleLoadMore = () => {
-		const nextVisibleCount = visibleCount + PAGE_SIZE
-		const filteredVideos = filterVideosByCategory(allVideos, activeCategory)
-		setVisibleCount(nextVisibleCount)
-		setVisibleVideos(filteredVideos.slice(0, nextVisibleCount))
-		setHasMore(filteredVideos.length > nextVisibleCount)
+		setVisibleCount((previousCount) => previousCount + PAGE_SIZE)
 	}
 
 	return {
@@ -70,7 +84,9 @@ export default function useHomeVideos() {
 		loading,
 		hasMore,
 		error,
+		searchQuery,
 		handleCategoryChange,
+		handleSearchChange,
 		handleLoadMore,
 	}
 }

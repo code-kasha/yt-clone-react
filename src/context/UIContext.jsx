@@ -13,15 +13,6 @@ export function UIProvider({ children }) {
 		if (savedTheme) return savedTheme === "dark"
 		return window.matchMedia("(prefers-color-scheme: dark)").matches
 	})
-	const [authToken, setAuthToken] = useState(() => {
-		if (typeof window === "undefined") return ""
-		return window.localStorage.getItem("authToken") || ""
-	})
-	const [currentUser, setCurrentUser] = useState(() => {
-		if (typeof window === "undefined") return null
-		const savedUser = window.localStorage.getItem("currentUser")
-		return savedUser ? JSON.parse(savedUser) : null
-	})
 
 	useEffect(() => {
 		const handleResize = () => {
@@ -39,34 +30,10 @@ export function UIProvider({ children }) {
 		window.localStorage.setItem("theme", darkMode ? "dark" : "light")
 	}, [darkMode])
 
-	useEffect(() => {
-		if (authToken) {
-			window.localStorage.setItem("authToken", authToken)
-		} else {
-			window.localStorage.removeItem("authToken")
-		}
-	}, [authToken])
-
-	useEffect(() => {
-		if (currentUser) {
-			window.localStorage.setItem("currentUser", JSON.stringify(currentUser))
-		} else {
-			window.localStorage.removeItem("currentUser")
-		}
-	}, [currentUser])
-
 	const toggleSidebar = () => setSidebarOpen((prev) => !prev)
 	const closeSidebar = () => setSidebarOpen(false)
 	const openSidebar = () => setSidebarOpen(true)
 	const toggleTheme = () => setDarkMode((prev) => !prev)
-	const login = ({ token, user }) => {
-		setAuthToken(token)
-		setCurrentUser(user)
-	}
-	const logout = () => {
-		setAuthToken("")
-		setCurrentUser(null)
-	}
 
 	return (
 		<UIContext.Provider
@@ -77,10 +44,6 @@ export function UIProvider({ children }) {
 				openSidebar,
 				darkMode,
 				toggleTheme,
-				authToken,
-				currentUser,
-				login,
-				logout,
 			}}
 		>
 			{children}

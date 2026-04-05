@@ -1,9 +1,53 @@
-import { useState } from "react"
+import axios from "axios"
+import { useEffect, useState } from "react"
 
-const CATEGORIES = ["All", "Tech", "Gaming", "Music", "Education"]
+const CATEGORIES_URL = "http://localhost:5000/api/categories"
+const FALLBACK_CATEGORIES = [
+	"All",
+	"Tech",
+	"Gaming",
+	"Music",
+	"Education",
+	"Entertainment",
+	"Sports",
+	"Other",
+]
+
+const normalizeCategories = (data) => {
+	const rawCategories = Array.isArray(data)
+		? data
+		: Array.isArray(data?.categories)
+			? data.categories
+			: []
+
+	const normalizedCategories = rawCategories
+		.map((category) => {
+			if (typeof category === "string") return category
+			return category?.name || category?.categoryName || category?.title || null
+		})
+		.filter(Boolean)
+
+	const mergedCategories = ["All", ...normalizedCategories]
+	const uniqueCategories = [...new Set(mergedCategories)]
+
+	return uniqueCategories.length >= 6 ? uniqueCategories : FALLBACK_CATEGORIES
+}
 
 export default function FilterBar({ onCategoryChange }) {
 	const [activeCategory, setActiveCategory] = useState("All")
+	const [categories, setCategories] = useState(FALLBACK_CATEGORIES)
+
+	useEffect(() => {
+		axios
+			.get(CATEGORIES_URL)
+			.then(({ data }) => {
+				setCategories(normalizeCategories(data))
+			})
+			.catch((error) => {
+				console.error("Failed to load categories", error)
+				setCategories(FALLBACK_CATEGORIES)
+			})
+	}, [])
 
 	const handleCategoryClick = (category) => {
 		if (category === activeCategory) return
@@ -13,8 +57,8 @@ export default function FilterBar({ onCategoryChange }) {
 
 	return (
 		<div className="sticky top-0 z-30 border-b border-gray-200 bg-white/95 backdrop-blur supports-backdrop-filter:bg-white/80 dark:border-gray-800 dark:bg-[#121212]/95 dark:supports-backdrop-filter:bg-[#121212]/80">
-			<div className="mx-auto flex w-full max-w-400 gap-2 overflow-x-auto px-3 py-3 scrollbar-hide xxs:px-4 sm:gap-3 sm:px-5">
-				{CATEGORIES.map((category) => (
+			<div className="mx-auto flex w-full max-w-[1600px] gap-2 overflow-x-auto px-3 py-3 scrollbar-hide xxs:px-4 sm:gap-3 sm:px-5">
+				{categories.map((category) => (
 					<button
 						key={category}
 						onClick={() => handleCategoryClick(category)}

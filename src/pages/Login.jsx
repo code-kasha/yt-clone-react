@@ -1,7 +1,7 @@
 import axios from "axios"
 import { useContext, useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
-import { UIContext } from "../context/UIContext"
+import { AuthContext } from "../context/AuthContext"
 
 const INITIAL_FORM = {
 	email: "",
@@ -26,7 +26,7 @@ const validateForm = ({ email, password }) => {
 
 export default function Login() {
 	const navigate = useNavigate()
-	const { login } = useContext(UIContext)
+	const { login } = useContext(AuthContext)
 	const [formData, setFormData] = useState(INITIAL_FORM)
 	const [errors, setErrors] = useState({})
 	const [submitting, setSubmitting] = useState(false)

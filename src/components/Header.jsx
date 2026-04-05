@@ -5,13 +5,14 @@ import { HiOutlineMoon } from "react-icons/hi2"
 import { HiOutlineSun } from "react-icons/hi2"
 import { IoSearchSharp } from "react-icons/io5"
 import { FaYoutube } from "react-icons/fa"
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
+import { AuthContext } from "../context/AuthContext"
 import { UIContext } from "../context/UIContext"
 
-export default function Header() {
-	const { toggleSidebar, darkMode, toggleTheme, currentUser, logout } =
-		useContext(UIContext)
-	const [searchQuery, setSearchQuery] = useState("")
+export default function Header({ searchQuery = "", onSearchChange }) {
+	const navigate = useNavigate()
+	const { toggleSidebar, darkMode, toggleTheme } = useContext(UIContext)
+	const { user, logout, isAuthenticated } = useContext(AuthContext)
 	const [mobileSearchOpen, setMobileSearchOpen] = useState(false)
 	const inputRef = useRef(null)
 
@@ -24,6 +25,11 @@ export default function Header() {
 	const handleSubmit = (event) => {
 		event.preventDefault()
 		setMobileSearchOpen(false)
+	}
+
+	const handleLogout = () => {
+		logout()
+		navigate("/")
 	}
 
 	return (
@@ -73,7 +79,7 @@ export default function Header() {
 								type="text"
 								placeholder="Search"
 								value={searchQuery}
-								onChange={(event) => setSearchQuery(event.target.value)}
+								onChange={(event) => onSearchChange?.(event.target.value)}
 								className="min-w-0 flex-1 bg-transparent text-sm text-black outline-none placeholder:text-gray-500 dark:text-white dark:placeholder:text-gray-400"
 							/>
 							<button
@@ -120,14 +126,21 @@ export default function Header() {
 							<HiOutlineMoon size={20} className="text-gray-700" />
 						)}
 					</button>
-					{currentUser ? (
+					{isAuthenticated ? (
 						<div className="flex items-center gap-2">
+							<div className="h-8 w-8 overflow-hidden rounded-full bg-gray-300 dark:bg-gray-700">
+								<img
+									src={user?.avatar}
+									alt={user?.username}
+									className="h-full w-full object-cover"
+								/>
+							</div>
 							<span className="hidden text-sm font-medium text-gray-800 dark:text-gray-200 sm:inline">
-								{currentUser.username}
+								{user?.username}
 							</span>
 							<button
 								type="button"
-								onClick={logout}
+								onClick={handleLogout}
 								className="rounded-full px-3 py-1.5 text-sm font-medium text-blue-600 transition hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-950/50 xxs:px-4 sm:px-5"
 							>
 								Log out
