@@ -25,7 +25,7 @@ export default function CommentSection({
 	}
 
 	return (
-		<section className="mx-auto w-full max-w-[960px] px-3 py-6 xxs:px-4 sm:px-5">
+		<section className="w-full max-w-[960px] py-5">
 			<div className="mb-4">
 				<h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
 					{commentCountLabel}
@@ -48,16 +48,16 @@ export default function CommentSection({
 					<textarea
 						value={draftComment}
 						onChange={(event) => setDraftComment(event.target.value)}
-						rows={3}
+						rows={2}
 						placeholder="Add a comment..."
-						className="w-full rounded-2xl border border-gray-300 bg-white px-4 py-3 text-sm text-gray-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 dark:border-gray-700 dark:bg-[#181818] dark:text-gray-100 dark:focus:border-blue-400 dark:focus:ring-blue-950"
+						className="w-full border-0 border-b border-gray-300 bg-transparent px-0 py-2 text-sm text-gray-900 outline-none transition focus:border-blue-500 focus:ring-0 dark:border-gray-700 dark:text-gray-100 dark:focus:border-blue-400"
 					/>
 					<div className="flex justify-end">
 						<button
 							type="button"
 							onClick={handleAddComment}
 							disabled={!draftComment.trim()}
-							className="rounded-full bg-gray-900 px-5 py-2 text-sm font-medium text-white transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-white dark:text-[#121212] dark:hover:bg-gray-200"
+							className="rounded-full bg-blue-600 px-5 py-2 text-sm font-medium text-white transition hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-blue-500 dark:hover:bg-blue-400"
 						>
 							Add comment
 						</button>
@@ -71,13 +71,15 @@ export default function CommentSection({
 						<CommentCard
 							key={comment.id || comment._id}
 							comment={comment}
-							canManage={currentUser?._id === comment?.user?._id}
+							canManage={
+								(currentUser?.id || currentUser?._id) === comment?.user?._id
+							}
 							onEdit={onEditComment}
 							onDelete={onDeleteComment}
 						/>
 					))
 				) : (
-					<div className="rounded-2xl bg-white px-4 py-6 text-sm text-gray-500 shadow-sm dark:bg-[#181818] dark:text-gray-400">
+					<div className="rounded-xl border border-gray-200 bg-white px-4 py-6 text-sm text-gray-500 dark:border-gray-800 dark:bg-[#181818] dark:text-gray-400">
 						No comments yet. Start the conversation.
 					</div>
 				)}
@@ -85,4 +87,3 @@ export default function CommentSection({
 		</section>
 	)
 }
-

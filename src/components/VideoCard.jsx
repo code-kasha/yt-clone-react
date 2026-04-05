@@ -13,7 +13,7 @@ export default function VideoCard({ video }) {
 		: "Recently uploaded"
 
 	return (
-		<Link to={`/video/${video.id}`} className="group block cursor-pointer">
+		<Link to={`/video/${video.routeId || video.id}`} className="group block cursor-pointer">
 			<div className="relative mb-3 aspect-video overflow-hidden rounded-2xl bg-gray-300 transition duration-300 group-hover:rounded-xl dark:bg-[#272727]">
 				<img
 					src={video.thumbnail || FALLBACK_THUMBNAIL}

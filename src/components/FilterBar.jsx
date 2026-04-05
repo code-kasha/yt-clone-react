@@ -57,7 +57,7 @@ export default function FilterBar({ onCategoryChange }) {
 
 	return (
 		<div className="sticky top-0 z-30 border-b border-gray-200 bg-white/95 backdrop-blur supports-backdrop-filter:bg-white/80 dark:border-gray-800 dark:bg-[#121212]/95 dark:supports-backdrop-filter:bg-[#121212]/80">
-			<div className="mx-auto flex w-full max-w-[1600px] gap-2 overflow-x-auto px-3 py-3 scrollbar-hide xxs:px-4 sm:gap-3 sm:px-5">
+			<div className="mx-auto flex w-full max-w-400 gap-2 overflow-x-auto px-3 py-3 scrollbar-hide xxs:px-4 sm:gap-3 sm:px-5">
 				{categories.map((category) => (
 					<button
 						key={category}

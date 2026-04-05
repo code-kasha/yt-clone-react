@@ -28,7 +28,7 @@ export default function CommentCard({
 	}
 
 	return (
-		<div className="flex gap-3 rounded-2xl bg-white px-3 py-4 shadow-sm dark:bg-[#181818]">
+		<div className="flex gap-3 px-0 py-3">
 			<div className="h-10 w-10 shrink-0 overflow-hidden rounded-full bg-gray-300 dark:bg-gray-700">
 				<img
 					src={comment?.user?.avatar || FALLBACK_AVATAR}
@@ -56,7 +56,7 @@ export default function CommentCard({
 							value={draftText}
 							onChange={(event) => setDraftText(event.target.value)}
 							rows={3}
-							className="w-full rounded-2xl border border-gray-300 bg-white px-4 py-3 text-sm text-gray-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 dark:border-gray-700 dark:bg-[#222] dark:text-gray-100 dark:focus:border-blue-400 dark:focus:ring-blue-950"
+							className="w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-sm text-gray-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 dark:border-gray-700 dark:bg-[#222] dark:text-gray-100 dark:focus:border-blue-400 dark:focus:ring-blue-950"
 						/>
 						<div className="flex gap-2">
 							<button
@@ -106,4 +106,3 @@ export default function CommentCard({
 		</div>
 	)
 }
-
