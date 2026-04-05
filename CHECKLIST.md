@@ -86,79 +86,79 @@ Track every task before submission. Check off each item as it is completed.
 
 ## 🎬 Video Player Page (`/video/:id`)
 
-- [ ] Page loads correct video based on URL param
-- [ ] Video player renders (HTML5 `<video>` or iframe)
-- [ ] Video title displayed
-- [ ] Video description displayed
-- [ ] Channel name displayed (linked to `/channel/:id`)
-- [ ] View count increments on page load
-- [ ] **Like button** — shows count, toggles liked state (requires login)
-- [ ] **Dislike button** — shows count, toggles disliked state (requires login)
-- [ ] Like and Dislike are mutually exclusive (liking removes dislike)
+- [✅] Page loads correct video based on URL param
+- [✅] Video player renders (HTML5 `<video>` or iframe)
+- [✅] Video title displayed
+- [✅] Video description displayed
+- [✅] Channel name displayed (linked to `/channel/:id`)
+- [✅] View count increments on page load
+- [✅] **Like button** — shows count, toggles liked state (requires login)
+- [✅] **Dislike button** — shows count, toggles disliked state (requires login)
+- [✅] Like and Dislike are mutually exclusive (liking removes dislike)
 
 ### Comment Section
 
-- [ ] All comments displayed with: username, text, timestamp
-- [ ] Comments load from API on page mount
-- [ ] **Add comment** — textarea + submit button (requires login)
-- [ ] New comment appears immediately after submission (optimistic or re-fetch)
-- [ ] **Edit comment** — edit button visible only on own comments
-  - [ ] Inline edit form or modal
-  - [ ] Save updates comment in DB and UI
-- [ ] **Delete comment** — delete button visible only on own comments
-  - [ ] Confirmation before deletion
-  - [ ] Comment removed from UI after deletion
+- [✅] All comments displayed with: username, text, timestamp
+- [✅] Comments load from API on page mount
+- [✅] **Add comment** — textarea + submit button (requires login)
+- [✅] New comment appears immediately after submission (optimistic or re-fetch)
+- [✅] **Edit comment** — edit button visible only on own comments
+  - [✅] Inline edit form or modal
+  - [✅] Save updates comment in DB and UI
+- [✅] **Delete comment** — delete button visible only on own comments
+  - [✅] Confirmation before deletion
+  - [✅] Comment removed from UI after deletion
 
 ---
 
 ## 📺 Channel Page (`/channel/:id`)
 
-- [ ] Channel banner image displayed
-- [ ] Channel name displayed
-- [ ] Channel description displayed
-- [ ] Subscriber count displayed
-- [ ] Grid of videos belonging to this channel
-- [ ] Clicking a video navigates to Video Player page
+- [✅] Channel banner image displayed
+- [✅] Channel name displayed
+- [✅] Channel description displayed
+- [✅] Subscriber count displayed
+- [✅] Grid of videos belonging to this channel
+- [✅] Clicking a video navigates to Video Player page
 
 ### Owner-only actions (visible only when logged-in user owns the channel)
 
-- [ ] "Upload Video" / "Create Video" button visible
-  - [ ] Form with: Title, Description, Video URL, Thumbnail URL, Category
-  - [ ] New video saved to DB and appears in grid
-- [ ] **Edit** button on each video card
-  - [ ] Opens pre-filled edit form
-  - [ ] Changes saved to DB and reflected in UI
-- [ ] **Delete** button on each video card
-  - [ ] Confirmation dialog
-  - [ ] Video removed from DB and grid
+- [✅] "Upload Video" / "Create Video" button visible
+  - [✅] Form with: Title, Description, Video URL, Thumbnail URL, Category
+  - [✅] New video saved to DB and appears in grid
+- [✅] **Edit** button on each video card
+  - [✅] Opens pre-filled edit form
+  - [✅] Changes saved to DB and reflected in UI
+- [✅] **Delete** button on each video card
+  - [✅] Confirmation dialog
+  - [✅] Video removed from DB and grid
 
 ### Create Channel
 
-- [ ] "Create Channel" option visible only when user is signed in
-- [ ] Channel creation form: Channel Name, Description, Banner URL
-- [ ] After creation, user is directed to their new channel page
+- [✅] "Create Channel" option visible only when user is signed in
+- [✅] Channel creation form: Channel Name, Description, Banner URL
+- [✅] After creation, user is directed to their new channel page
 
 ---
 
 ## 🧩 Components
 
-- [ ] `Header.jsx` — logo, search bar, hamburger, auth state
-- [ ] `Sidebar.jsx` — nav links, toggle behaviour
-- [ ] `FilterBar.jsx` — 6+ category buttons
-- [ ] `VideoCard.jsx` — thumbnail, title, channel, views
-- [ ] `VideoGrid.jsx` — responsive grid layout
-- [ ] `CommentSection.jsx` — list + add comment
-- [ ] `CommentCard.jsx` — single comment with edit/delete
+- [✅] `Header.jsx` — logo, search bar, hamburger, auth state
+- [✅] `Sidebar.jsx` — nav links, toggle behaviour
+- [✅] `FilterBar.jsx` — 6+ category buttons
+- [✅] `VideoCard.jsx` — thumbnail, title, channel, views
+- [✅] `VideoGrid.jsx` — responsive grid layout
+- [✅] `CommentSection.jsx` — list + add comment
+- [✅] `CommentCard.jsx` — single comment with edit/delete
 
 ---
 
 ## 🌐 API Integration
 
-- [ ] `axiosInstance.js` created with `baseURL` from env
-- [ ] JWT automatically attached to requests via Axios interceptor
-- [ ] All API calls use `axiosInstance` (not raw `fetch`)
-- [ ] Loading states shown during API calls
-- [ ] Error states handled and displayed to user
+- [✅] `axiosInstance.js` created with `baseURL` from env
+- [✅] JWT automatically attached to requests via Axios interceptor
+- [✅] All API calls use `axiosInstance` (not raw `fetch`)
+- [✅] Loading states shown during API calls
+- [✅] Error states handled and displayed to user
 
 ---
 

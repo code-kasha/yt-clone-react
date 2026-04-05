@@ -1,9 +1,9 @@
-import axios from "axios"
 import { useContext, useEffect, useMemo, useState } from "react"
 import { BiDislike, BiLike } from "react-icons/bi"
 import { BiShare } from "react-icons/bi"
 import { BiBookmark } from "react-icons/bi"
 import { Link, useNavigate, useParams } from "react-router-dom"
+import axiosInstance from "../api/axiosInstance"
 import CommentSection from "../components/CommentSection"
 import Header from "../components/Header"
 import Sidebar from "../components/Sidebar"
@@ -14,6 +14,9 @@ import {
 } from "../api/videos"
 import { AuthContext } from "../context/AuthContext"
 import { UIContext } from "../context/UIContext"
+
+const VIDEO_REQUEST_DEDUP_MS = 2000
+const videoRequestCache = new Map()
 
 const getEmbedUrl = (videoUrl) => {
 	if (!videoUrl) return ""
@@ -59,6 +62,32 @@ const normalizeComments = (comments = []) =>
 		},
 	}))
 
+const getVideoRequest = (id) => {
+	const now = Date.now()
+	const cachedEntry = videoRequestCache.get(id)
+
+	if (cachedEntry && now - cachedEntry.createdAt < VIDEO_REQUEST_DEDUP_MS) {
+		return cachedEntry.promise
+	}
+
+	const request = axiosInstance.get(`/videos/${id}`)
+	videoRequestCache.set(id, {
+		promise: request,
+		createdAt: now,
+	})
+
+	request.finally(() => {
+		window.setTimeout(() => {
+			const latestEntry = videoRequestCache.get(id)
+			if (latestEntry?.promise === request) {
+				videoRequestCache.delete(id)
+			}
+		}, VIDEO_REQUEST_DEDUP_MS)
+	})
+
+	return request
+}
+
 export default function VideoPlayer() {
 	const navigate = useNavigate()
 	const { id } = useParams()
@@ -77,8 +106,7 @@ export default function VideoPlayer() {
 		setLoading(true)
 		setError("")
 
-		axios
-			.get(`http://localhost:5000/api/videos/${id}`)
+		getVideoRequest(id)
 			.then(({ data }) => {
 				const normalizedVideo = normalizeVideo(data?.video || {})
 				setVideo(normalizedVideo)
@@ -97,8 +125,8 @@ export default function VideoPlayer() {
 
 	useEffect(() => {
 		setCommentError("")
-		axios
-			.get(`http://localhost:5000/api/comments/${id}`)
+		axiosInstance
+			.get(`/comments/${id}`)
 			.then(({ data }) => {
 				setComments(normalizeComments(data?.comments || []))
 			})
@@ -112,8 +140,8 @@ export default function VideoPlayer() {
 	}, [id])
 
 	useEffect(() => {
-		axios
-			.get("http://localhost:5000/api/videos", {
+		axiosInstance
+			.get("/videos", {
 				params: {
 					page: 1,
 					limit: 20,
@@ -162,9 +190,7 @@ export default function VideoPlayer() {
 
 		setActionLoading(type)
 		try {
-			const { data } = await axios.put(
-				`http://localhost:5000/api/videos/${id}/${type}`,
-			)
+			const { data } = await axiosInstance.put(`/videos/${id}/${type}`)
 
 			setVideo((previousVideo) => ({
 				...previousVideo,
@@ -194,7 +220,7 @@ export default function VideoPlayer() {
 		setCommentError("")
 
 		try {
-			const { data } = await axios.post(`http://localhost:5000/api/comments/${id}`, {
+			const { data } = await axiosInstance.post(`/comments/${id}`, {
 				text,
 			})
 
@@ -218,8 +244,8 @@ export default function VideoPlayer() {
 		setCommentError("")
 
 		try {
-			const { data } = await axios.put(
-				`http://localhost:5000/api/comments/${commentToEdit.id}`,
+			const { data } = await axiosInstance.put(
+				`/comments/${commentToEdit.id}`,
 				{ text },
 			)
 
@@ -252,7 +278,7 @@ export default function VideoPlayer() {
 		setCommentError("")
 
 		try {
-			await axios.delete(`http://localhost:5000/api/comments/${commentToDelete.id}`)
+			await axiosInstance.delete(`/comments/${commentToDelete.id}`)
 			setComments((previousComments) =>
 				previousComments.filter((comment) => comment.id !== commentToDelete.id),
 			)

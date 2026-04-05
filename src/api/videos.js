@@ -1,6 +1,5 @@
-import axios from "axios"
+import axiosInstance from "./axiosInstance"
 
-const API_URL = "http://localhost:5000/api/videos"
 export const PAGE_SIZE = 12
 const FETCH_LIMIT = 200
 export const FALLBACK_THUMBNAIL =
@@ -33,7 +32,7 @@ export const normalizeVideo = (video) => ({
 })
 
 export const fetchVideos = () =>
-	axios.get(API_URL, {
+	axiosInstance.get("/videos", {
 		params: {
 			page: 1,
 			limit: FETCH_LIMIT,

@@ -1,6 +1,6 @@
-import axios from "axios"
 import { useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
+import axiosInstance from "../api/axiosInstance"
 
 const INITIAL_FORM = {
 	username: "",
@@ -66,7 +66,7 @@ export default function Register() {
 		setErrors({})
 
 		try {
-			await axios.post("http://localhost:5000/api/auth/register", {
+			await axiosInstance.post("/auth/register", {
 				username: formData.username.trim(),
 				email: formData.email.trim(),
 				password: formData.password,

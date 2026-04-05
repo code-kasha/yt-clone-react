@@ -1,4 +1,3 @@
-import axios from "axios"
 import { createContext, useEffect, useMemo, useState } from "react"
 
 export const AuthContext = createContext()
@@ -63,16 +62,13 @@ export function AuthProvider({ children }) {
 			setUser(null)
 			window.localStorage.removeItem("authToken")
 			window.localStorage.removeItem("currentUser")
-			delete axios.defaults.headers.common.Authorization
 			return
 		}
 
 		if (token) {
 			window.localStorage.setItem("authToken", token)
-			axios.defaults.headers.common.Authorization = `Bearer ${token}`
 		} else {
 			window.localStorage.removeItem("authToken")
-			delete axios.defaults.headers.common.Authorization
 		}
 	}, [token])
 
@@ -107,4 +103,3 @@ export function AuthProvider({ children }) {
 
 	return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }
-

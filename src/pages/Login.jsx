@@ -1,6 +1,6 @@
-import axios from "axios"
 import { useContext, useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
+import axiosInstance from "../api/axiosInstance"
 import { AuthContext } from "../context/AuthContext"
 
 const INITIAL_FORM = {
@@ -60,7 +60,7 @@ export default function Login() {
 		setApiMessage("")
 
 		try {
-			const { data } = await axios.post("http://localhost:5000/api/auth/login", {
+			const { data } = await axiosInstance.post("/auth/login", {
 				email: formData.email.trim(),
 				password: formData.password,
 			})

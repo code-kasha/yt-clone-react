@@ -75,6 +75,7 @@ export default function Header({ searchQuery = "", onSearchChange }) {
 						</button>
 						<div className="flex w-full items-center rounded-full border border-gray-300 bg-gray-50 py-1.5 pl-4 pr-2 shadow-sm focus-within:border-blue-500 focus-within:bg-white focus-within:ring-2 focus-within:ring-blue-100 dark:border-gray-700 dark:bg-[#1f1f1f] dark:focus-within:border-blue-400 dark:focus-within:bg-[#181818] dark:focus-within:ring-blue-950">
 							<input
+								id="search-input"
 								ref={inputRef}
 								type="text"
 								placeholder="Search"
@@ -128,16 +129,21 @@ export default function Header({ searchQuery = "", onSearchChange }) {
 					</button>
 					{isAuthenticated ? (
 						<div className="flex items-center gap-2">
-							<div className="h-8 w-8 overflow-hidden rounded-full bg-gray-300 dark:bg-gray-700">
-								<img
-									src={user?.avatar}
-									alt={user?.username}
-									className="h-full w-full object-cover"
-								/>
-							</div>
-							<span className="hidden text-sm font-medium text-gray-800 dark:text-gray-200 sm:inline">
-								{user?.username}
-							</span>
+							<Link
+								to="/profile"
+								className="flex items-center gap-2 rounded-full px-1 py-1 transition hover:bg-gray-100 dark:hover:bg-[#272727]"
+							>
+								<div className="h-8 w-8 overflow-hidden rounded-full bg-gray-300 dark:bg-gray-700">
+									<img
+										src={user?.avatar}
+										alt={user?.username}
+										className="h-full w-full object-cover"
+									/>
+								</div>
+								<span className="hidden text-sm font-medium text-gray-800 dark:text-gray-200 sm:inline">
+									{user?.username}
+								</span>
+							</Link>
 							<button
 								type="button"
 								onClick={handleLogout}

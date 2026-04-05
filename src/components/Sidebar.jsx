@@ -25,7 +25,7 @@ const mainItems = [
 		icon: MdOutlineSubscriptions,
 		href: "",
 	},
-	{ name: "Library", icon: MdOutlineVideoLibrary, href: "" },
+	{ name: "Library", icon: MdOutlineVideoLibrary, href: "/my-channels" },
 	{ name: "History", icon: MdOutlineHistory, href: "" },
 ]
 
@@ -59,11 +59,11 @@ const collapsedItems = [
 	{ name: "Home", icon: HiOutlineHome, href: "/home" },
 	{ name: "Shorts", icon: MdOutlinePlayCircle, href: "" },
 	{
-		name: "Subscriptions",
+		name: "Channels",
 		icon: MdOutlineSubscriptions,
-		href: "",
+		href: "/my-channels",
 	},
-	{ name: "You", icon: MdOutlineAccountCircle, href: "" },
+	{ name: "You", icon: MdOutlineAccountCircle, href: "/profile" },
 ]
 
 export default function Sidebar() {

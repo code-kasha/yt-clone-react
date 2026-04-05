@@ -1,7 +1,5 @@
-import axios from "axios"
-import { useEffect, useState } from "react"
+import { useState } from "react"
 
-const CATEGORIES_URL = "http://localhost:5000/api/categories"
 const FALLBACK_CATEGORIES = [
 	"All",
 	"Tech",
@@ -13,41 +11,9 @@ const FALLBACK_CATEGORIES = [
 	"Other",
 ]
 
-const normalizeCategories = (data) => {
-	const rawCategories = Array.isArray(data)
-		? data
-		: Array.isArray(data?.categories)
-			? data.categories
-			: []
-
-	const normalizedCategories = rawCategories
-		.map((category) => {
-			if (typeof category === "string") return category
-			return category?.name || category?.categoryName || category?.title || null
-		})
-		.filter(Boolean)
-
-	const mergedCategories = ["All", ...normalizedCategories]
-	const uniqueCategories = [...new Set(mergedCategories)]
-
-	return uniqueCategories.length >= 6 ? uniqueCategories : FALLBACK_CATEGORIES
-}
-
 export default function FilterBar({ onCategoryChange }) {
 	const [activeCategory, setActiveCategory] = useState("All")
-	const [categories, setCategories] = useState(FALLBACK_CATEGORIES)
-
-	useEffect(() => {
-		axios
-			.get(CATEGORIES_URL)
-			.then(({ data }) => {
-				setCategories(normalizeCategories(data))
-			})
-			.catch((error) => {
-				console.error("Failed to load categories", error)
-				setCategories(FALLBACK_CATEGORIES)
-			})
-	}, [])
+	const [categories] = useState(FALLBACK_CATEGORIES)
 
 	const handleCategoryClick = (category) => {
 		if (category === activeCategory) return

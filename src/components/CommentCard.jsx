@@ -53,6 +53,7 @@ export default function CommentCard({
 				{isEditing ? (
 					<div className="mt-2 space-y-3">
 						<textarea
+							id="comment_area"
 							value={draftText}
 							onChange={(event) => setDraftText(event.target.value)}
 							rows={3}
