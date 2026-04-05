@@ -15,6 +15,7 @@ export default function CommentCard({
 	canManage = false,
 	onEdit,
 	onDelete,
+	busy = false,
 }) {
 	const [isEditing, setIsEditing] = useState(false)
 	const [draftText, setDraftText] = useState(comment?.text || "")
@@ -24,7 +25,6 @@ export default function CommentCard({
 		if (!trimmedText) return
 
 		onEdit?.(comment, trimmedText)
-		setIsEditing(false)
 	}
 
 	return (
@@ -56,15 +56,17 @@ export default function CommentCard({
 							value={draftText}
 							onChange={(event) => setDraftText(event.target.value)}
 							rows={3}
+							disabled={busy}
 							className="w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-sm text-gray-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 dark:border-gray-700 dark:bg-[#222] dark:text-gray-100 dark:focus:border-blue-400 dark:focus:ring-blue-950"
 						/>
 						<div className="flex gap-2">
 							<button
 								type="button"
 								onClick={handleSave}
+								disabled={busy}
 								className="rounded-full bg-gray-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-gray-800 dark:bg-white dark:text-[#121212] dark:hover:bg-gray-200"
 							>
-								Save
+								{busy ? "Saving..." : "Save"}
 							</button>
 							<button
 								type="button"
@@ -72,6 +74,7 @@ export default function CommentCard({
 									setDraftText(comment?.text || "")
 									setIsEditing(false)
 								}}
+								disabled={busy}
 								className="rounded-full bg-gray-200 px-4 py-2 text-sm font-medium text-gray-800 transition hover:bg-gray-300 dark:bg-[#272727] dark:text-gray-100 dark:hover:bg-[#353535]"
 							>
 								Cancel
@@ -89,6 +92,7 @@ export default function CommentCard({
 						<button
 							type="button"
 							onClick={() => setIsEditing(true)}
+							disabled={busy}
 							className="rounded-full bg-gray-200 px-3 py-1.5 text-xs font-medium text-gray-800 transition hover:bg-gray-300 dark:bg-[#272727] dark:text-gray-100 dark:hover:bg-[#353535]"
 						>
 							Edit
@@ -96,6 +100,7 @@ export default function CommentCard({
 						<button
 							type="button"
 							onClick={() => onDelete?.(comment)}
+							disabled={busy}
 							className="rounded-full bg-red-50 px-3 py-1.5 text-xs font-medium text-red-700 transition hover:bg-red-100 dark:bg-red-950/40 dark:text-red-300 dark:hover:bg-red-950/60"
 						>
 							Delete

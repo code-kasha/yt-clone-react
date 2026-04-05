@@ -5,9 +5,13 @@ import { FALLBACK_AVATAR } from "../api/videos"
 export default function CommentSection({
 	comments = [],
 	currentUser = null,
+	isAuthenticated = false,
 	onAddComment,
 	onEditComment,
 	onDeleteComment,
+	error = "",
+	busy = false,
+	busyCommentId = "",
 }) {
 	const [draftComment, setDraftComment] = useState("")
 
@@ -21,7 +25,6 @@ export default function CommentSection({
 		if (!trimmedComment) return
 
 		onAddComment?.(trimmedComment)
-		setDraftComment("")
 	}
 
 	return (
@@ -49,17 +52,23 @@ export default function CommentSection({
 						value={draftComment}
 						onChange={(event) => setDraftComment(event.target.value)}
 						rows={2}
-						placeholder="Add a comment..."
+						placeholder={
+							isAuthenticated ? "Add a comment..." : "Sign in to add a comment..."
+						}
+						disabled={!isAuthenticated || busy}
 						className="w-full border-0 border-b border-gray-300 bg-transparent px-0 py-2 text-sm text-gray-900 outline-none transition focus:border-blue-500 focus:ring-0 dark:border-gray-700 dark:text-gray-100 dark:focus:border-blue-400"
 					/>
+					{error ? (
+						<p className="text-sm text-red-600 dark:text-red-400">{error}</p>
+					) : null}
 					<div className="flex justify-end">
 						<button
 							type="button"
 							onClick={handleAddComment}
-							disabled={!draftComment.trim()}
+							disabled={!isAuthenticated || !draftComment.trim() || busy}
 							className="rounded-full bg-blue-600 px-5 py-2 text-sm font-medium text-white transition hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-blue-500 dark:hover:bg-blue-400"
 						>
-							Add comment
+							{busy ? "Saving..." : "Add comment"}
 						</button>
 					</div>
 				</div>
@@ -76,6 +85,7 @@ export default function CommentSection({
 							}
 							onEdit={onEditComment}
 							onDelete={onDeleteComment}
+							busy={busyCommentId === comment.id}
 						/>
 					))
 				) : (

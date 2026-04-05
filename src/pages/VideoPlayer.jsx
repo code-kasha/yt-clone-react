@@ -70,6 +70,8 @@ export default function VideoPlayer() {
 	const [loading, setLoading] = useState(true)
 	const [error, setError] = useState("")
 	const [actionLoading, setActionLoading] = useState("")
+	const [commentError, setCommentError] = useState("")
+	const [commentBusyId, setCommentBusyId] = useState("")
 
 	useEffect(() => {
 		setLoading(true)
@@ -80,7 +82,6 @@ export default function VideoPlayer() {
 			.then(({ data }) => {
 				const normalizedVideo = normalizeVideo(data?.video || {})
 				setVideo(normalizedVideo)
-				setComments(normalizeComments(data?.video?.comments || []))
 			})
 			.catch((fetchError) => {
 				console.error("Failed to load video", fetchError)
@@ -91,6 +92,22 @@ export default function VideoPlayer() {
 			})
 			.finally(() => {
 				setLoading(false)
+			})
+	}, [id])
+
+	useEffect(() => {
+		setCommentError("")
+		axios
+			.get(`http://localhost:5000/api/comments/${id}`)
+			.then(({ data }) => {
+				setComments(normalizeComments(data?.comments || []))
+			})
+			.catch((fetchError) => {
+				console.error("Failed to load comments", fetchError)
+				setCommentError(
+					fetchError.response?.data?.message ||
+						"Could not load comments right now.",
+				)
 			})
 	}, [id])
 
@@ -167,36 +184,87 @@ export default function VideoPlayer() {
 		}
 	}
 
-	const handleAddComment = (text) => {
-		if (!user) return
+	const handleAddComment = async (text) => {
+		if (!isAuthenticated) {
+			navigate("/login")
+			return
+		}
 
-		setComments((previousComments) => [
-			{
-				id: `local-${Date.now()}`,
+		setCommentBusyId("new")
+		setCommentError("")
+
+		try {
+			const { data } = await axios.post(`http://localhost:5000/api/comments/${id}`, {
 				text,
-				timestamp: new Date().toISOString(),
-				user: {
-					_id: user.id,
-					username: user.username,
-					avatar: user.avatar,
-				},
-			},
-			...previousComments,
-		])
+			})
+
+			const newComment = normalizeComments([data?.comment]).at(0)
+			if (newComment) {
+				setComments((previousComments) => [newComment, ...previousComments])
+			}
+		} catch (commentAddError) {
+			console.error("Failed to add comment", commentAddError)
+			setCommentError(
+				commentAddError.response?.data?.message ||
+					"Could not add comment right now.",
+			)
+		} finally {
+			setCommentBusyId("")
+		}
 	}
 
-	const handleEditComment = (commentToEdit, text) => {
-		setComments((previousComments) =>
-			previousComments.map((comment) =>
-				comment.id === commentToEdit.id ? { ...comment, text } : comment,
-			),
-		)
+	const handleEditComment = async (commentToEdit, text) => {
+		setCommentBusyId(commentToEdit.id)
+		setCommentError("")
+
+		try {
+			const { data } = await axios.put(
+				`http://localhost:5000/api/comments/${commentToEdit.id}`,
+				{ text },
+			)
+
+			const updatedComment = normalizeComments([data?.comment]).at(0)
+			if (updatedComment) {
+				setComments((previousComments) =>
+					previousComments.map((comment) =>
+						comment.id === commentToEdit.id ? updatedComment : comment,
+					),
+				)
+			}
+		} catch (commentEditError) {
+			console.error("Failed to edit comment", commentEditError)
+			setCommentError(
+				commentEditError.response?.data?.message ||
+					"Could not update comment right now.",
+			)
+		} finally {
+			setCommentBusyId("")
+		}
 	}
 
-	const handleDeleteComment = (commentToDelete) => {
-		setComments((previousComments) =>
-			previousComments.filter((comment) => comment.id !== commentToDelete.id),
+	const handleDeleteComment = async (commentToDelete) => {
+		const confirmed = window.confirm(
+			"Delete this comment? This action cannot be undone.",
 		)
+		if (!confirmed) return
+
+		setCommentBusyId(commentToDelete.id)
+		setCommentError("")
+
+		try {
+			await axios.delete(`http://localhost:5000/api/comments/${commentToDelete.id}`)
+			setComments((previousComments) =>
+				previousComments.filter((comment) => comment.id !== commentToDelete.id),
+			)
+		} catch (commentDeleteError) {
+			console.error("Failed to delete comment", commentDeleteError)
+			setCommentError(
+				commentDeleteError.response?.data?.message ||
+					"Could not delete comment right now.",
+			)
+		} finally {
+			setCommentBusyId("")
+		}
 	}
 
 	return (
@@ -330,9 +398,13 @@ export default function VideoPlayer() {
 										<CommentSection
 											comments={comments}
 											currentUser={user}
+											isAuthenticated={isAuthenticated}
 											onAddComment={handleAddComment}
 											onEditComment={handleEditComment}
 											onDeleteComment={handleDeleteComment}
+											error={commentError}
+											busy={commentBusyId === "new"}
+											busyCommentId={commentBusyId}
 										/>
 									</div>
 

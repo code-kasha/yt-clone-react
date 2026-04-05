@@ -23,10 +23,10 @@ const mainItems = [
 	{
 		name: "Subscriptions",
 		icon: MdOutlineSubscriptions,
-		href: "/subscriptions",
+		href: "",
 	},
-	{ name: "Library", icon: MdOutlineVideoLibrary, href: "/library" },
-	{ name: "History", icon: MdOutlineHistory, href: "/history" },
+	{ name: "Library", icon: MdOutlineVideoLibrary, href: "" },
+	{ name: "History", icon: MdOutlineHistory, href: "" },
 ]
 
 const extraMainItems = [
