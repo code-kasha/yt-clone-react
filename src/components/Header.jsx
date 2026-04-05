@@ -5,10 +5,12 @@ import { HiOutlineMoon } from "react-icons/hi2"
 import { HiOutlineSun } from "react-icons/hi2"
 import { IoSearchSharp } from "react-icons/io5"
 import { FaYoutube } from "react-icons/fa"
+import { Link } from "react-router-dom"
 import { UIContext } from "../context/UIContext"
 
 export default function Header() {
-	const { toggleSidebar, darkMode, toggleTheme } = useContext(UIContext)
+	const { toggleSidebar, darkMode, toggleTheme, currentUser, logout } =
+		useContext(UIContext)
 	const [searchQuery, setSearchQuery] = useState("")
 	const [mobileSearchOpen, setMobileSearchOpen] = useState(false)
 	const inputRef = useRef(null)
@@ -118,9 +120,27 @@ export default function Header() {
 							<HiOutlineMoon size={20} className="text-gray-700" />
 						)}
 					</button>
-					<button className="rounded-full px-3 py-1.5 text-sm font-medium text-blue-600 transition hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-950/50 xxs:px-4 sm:px-5">
-						Sign In
-					</button>
+					{currentUser ? (
+						<div className="flex items-center gap-2">
+							<span className="hidden text-sm font-medium text-gray-800 dark:text-gray-200 sm:inline">
+								{currentUser.username}
+							</span>
+							<button
+								type="button"
+								onClick={logout}
+								className="rounded-full px-3 py-1.5 text-sm font-medium text-blue-600 transition hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-950/50 xxs:px-4 sm:px-5"
+							>
+								Log out
+							</button>
+						</div>
+					) : (
+						<Link
+							to="/login"
+							className="rounded-full px-3 py-1.5 text-sm font-medium text-blue-600 transition hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-950/50 xxs:px-4 sm:px-5"
+						>
+							Sign In
+						</Link>
+					)}
 				</div>
 			</div>
 		</header>
