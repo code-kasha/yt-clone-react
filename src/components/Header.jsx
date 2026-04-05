@@ -26,7 +26,7 @@ export default function Header() {
 
 	return (
 		<header className="sticky top-0 z-50 border-b border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-[#0f0f0f]">
-			<div className="mx-auto flex w-full max-w-[1600px] items-center gap-2 px-3 py-2 xxs:px-4 sm:gap-4 sm:px-5">
+			<div className="mx-auto flex w-full items-center justify-between gap-2 px-3 py-2 xxs:px-4 sm:gap-4 sm:px-5">
 				<div
 					className={`flex min-w-fit items-center gap-2 xxs:gap-3 ${
 						mobileSearchOpen ? "hidden" : "flex"
@@ -49,11 +49,11 @@ export default function Header() {
 
 				<form
 					onSubmit={handleSubmit}
-					className={`min-w-0 flex-1 justify-center ${
+					className={`min-w-0 flex-1 justify-center sm:px-4 ${
 						mobileSearchOpen ? "flex" : "hidden"
 					} sm:flex`}
 				>
-					<div className="flex w-full items-center gap-2 sm:mx-auto sm:max-w-xl sm:justify-center sm:px-4">
+					<div className="flex w-full items-center gap-2 sm:mx-auto sm:max-w-xl">
 						<button
 							type="button"
 							onClick={() => setMobileSearchOpen(false)}
@@ -89,7 +89,7 @@ export default function Header() {
 				</form>
 
 				<div
-					className={`ml-auto min-w-fit items-center gap-1 xxs:gap-2 ${
+					className={`min-w-fit items-center gap-1 xxs:gap-2 ${
 						mobileSearchOpen ? "hidden" : "flex"
 					}`}
 				>
@@ -99,13 +99,18 @@ export default function Header() {
 						className="rounded-full p-2 transition hover:bg-gray-100 dark:hover:bg-gray-800 sm:hidden"
 						aria-label="Open search"
 					>
-						<IoSearchSharp size={20} className="text-gray-700 dark:text-gray-200" />
+						<IoSearchSharp
+							size={20}
+							className="text-gray-700 dark:text-gray-200"
+						/>
 					</button>
 					<button
 						type="button"
 						onClick={toggleTheme}
 						className="rounded-full p-2 transition hover:bg-gray-100 dark:hover:bg-gray-800"
-						aria-label={darkMode ? "Switch to light mode" : "Switch to dark mode"}
+						aria-label={
+							darkMode ? "Switch to light mode" : "Switch to dark mode"
+						}
 					>
 						{darkMode ? (
 							<HiOutlineSun size={20} className="text-amber-400" />

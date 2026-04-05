@@ -32,7 +32,7 @@ Track every task before submission. Check off each item as it is completed.
 - [✅] Video grid renders in a responsive layout
 - [✅] Each video card shows: Thumbnail, Title, Channel Name, View count
 - [✅] Clicking a video card navigates to `/video/:id`
-- [ ] Newly uploaded videos appear on the Home page dynamically
+- [✅] Newly uploaded videos appear on the Home page dynamically
 
 ---
 

@@ -52,6 +52,7 @@ export default function useHomeVideos() {
 	}, [activeCategory, refreshVideos])
 
 	const handleCategoryChange = (category) => {
+		if (category === activeCategory) return
 		setActiveCategory(category)
 		setLoading(true)
 	}
@@ -73,4 +74,3 @@ export default function useHomeVideos() {
 		handleLoadMore,
 	}
 }
-

@@ -1,29 +1,19 @@
 import { useState } from "react"
 
-const CATEGORIES = [
-	"All",
-	"Music",
-	"Gaming",
-	"Entertainment",
-	"Sports",
-	"Technology",
-	"Education",
-	"News",
-	"Comedy",
-	"Cooking",
-]
+const CATEGORIES = ["All", "Tech", "Gaming", "Music", "Education"]
 
 export default function FilterBar({ onCategoryChange }) {
 	const [activeCategory, setActiveCategory] = useState("All")
 
 	const handleCategoryClick = (category) => {
+		if (category === activeCategory) return
 		setActiveCategory(category)
 		onCategoryChange?.(category)
 	}
 
 	return (
-		<div className="sticky top-0 z-30 border-b border-gray-200 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80 dark:border-gray-800 dark:bg-[#121212]/95 dark:supports-[backdrop-filter]:bg-[#121212]/80">
-			<div className="mx-auto flex w-full max-w-[1600px] gap-2 overflow-x-auto px-3 py-3 scrollbar-hide xxs:px-4 sm:gap-3 sm:px-5">
+		<div className="sticky top-0 z-30 border-b border-gray-200 bg-white/95 backdrop-blur supports-backdrop-filter:bg-white/80 dark:border-gray-800 dark:bg-[#121212]/95 dark:supports-backdrop-filter:bg-[#121212]/80">
+			<div className="mx-auto flex w-full max-w-400 gap-2 overflow-x-auto px-3 py-3 scrollbar-hide xxs:px-4 sm:gap-3 sm:px-5">
 				{CATEGORIES.map((category) => (
 					<button
 						key={category}
