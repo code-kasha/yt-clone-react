@@ -6,32 +6,32 @@ Track every task before submission. Check off each item as it is completed.
 
 ## 📁 Project Setup
 
-- [ ] Project bootstrapped with **Vite** (NOT Create React App)
-- [ ] React 18 installed
-- [ ] Tailwind CSS installed and configured (`tailwind.config.js`, `index.css` with directives)
-- [ ] React Router v6 installed
-- [ ] Axios installed
-- [ ] React Icons installed
-- [ ] `.env` file created with `VITE_API_URL`
-- [ ] `.env.example` committed with placeholder value
-- [ ] `.gitignore` includes `node_modules/`, `.env`, `dist/`
-- [ ] Folder structure created: `pages/`, `components/`, `context/`, `api/`, `utils/`
+- [✅] Project bootstrapped with **Vite** (NOT Create React App)
+- [✅] React 18 installed
+- [✅] Tailwind CSS installed and configured (`tailwind.config.js`, `index.css` with directives)
+- [✅] React Router v6 installed
+- [✅] Axios installed
+- [✅] React Icons installed
+- [✅] `.env` file created with `VITE_API_URL`
+- [✅] `.env.example` committed with placeholder value
+- [✅] `.gitignore` includes `node_modules/`, `.env`, `dist/`
+- [✅] Folder structure created: `pages/`, `components/`, `context/`, `api/`, `utils/`
 
 ---
 
 ## 🏠 Home Page
 
-- [ ] Header component rendered at top
-- [ ] Logo present in Header
-- [ ] Hamburger menu button toggles Sidebar open/closed
-- [ ] Sidebar component renders navigation links
-- [ ] Sidebar can be toggled (hidden/visible) from hamburger icon
-- [ ] Filter bar renders at least **6 category buttons**
-- [ ] `All` filter is selected by default and shows all videos
-- [ ] Clicking a filter button shows only videos of that category
-- [ ] Video grid renders in a responsive layout
-- [ ] Each video card shows: Thumbnail, Title, Channel Name, View count
-- [ ] Clicking a video card navigates to `/video/:id`
+- [✅] Header component rendered at top
+- [✅] Logo present in Header
+- [✅] Hamburger menu button toggles Sidebar open/closed
+- [✅] Sidebar component renders navigation links
+- [✅] Sidebar can be toggled (hidden/visible) from hamburger icon
+- [✅] Filter bar renders at least **6 category buttons**
+- [✅] `All` filter is selected by default and shows all videos
+- [✅] Clicking a filter button shows only videos of that category
+- [✅] Video grid renders in a responsive layout
+- [✅] Each video card shows: Thumbnail, Title, Channel Name, View count
+- [✅] Clicking a video card navigates to `/video/:id`
 - [ ] Newly uploaded videos appear on the Home page dynamically
 
 ---

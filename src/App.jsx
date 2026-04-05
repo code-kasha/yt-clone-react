@@ -1,11 +1,13 @@
 import OfflineIndicator from "./components/OfflineIndicator"
+import Router from "./router"
+import { UIProvider } from "./context/UIContext"
 
 function App() {
 	return (
-		<>
+		<UIProvider>
 			<OfflineIndicator />
-			<div className=""></div>
-		</>
+			<Router />
+		</UIProvider>
 	)
 }
 
