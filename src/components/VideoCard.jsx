@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom"
+import { FALLBACK_AVATAR, FALLBACK_THUMBNAIL } from "../api/videos"
 
 export default function VideoCard({ video }) {
 	const formatViews = (views) => {
@@ -7,37 +8,46 @@ export default function VideoCard({ video }) {
 		return views
 	}
 
+	const publishedLabel = video.publishedAt
+		? new Date(video.publishedAt).toLocaleDateString()
+		: "Recently uploaded"
+
 	return (
-		<Link to={`/video/${video.id}`} className="group cursor-pointer">
-			{/* Thumbnail */}
-			<div className="relative bg-gray-300 rounded-xl overflow-hidden h-40 mb-3 group-hover:rounded-none transition">
+		<Link to={`/video/${video.id}`} className="group block cursor-pointer">
+			<div className="relative mb-3 aspect-video overflow-hidden rounded-2xl bg-gray-300 transition duration-300 group-hover:rounded-xl dark:bg-[#272727]">
 				<img
-					src={
-						video.thumbnail || "https://via.placeholder.com/320x180?text=Video"
-					}
+					src={video.thumbnail || FALLBACK_THUMBNAIL}
 					alt={video.title}
-					className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
+					onError={(event) => {
+						event.currentTarget.src = FALLBACK_THUMBNAIL
+					}}
+					className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
 				/>
-				<span className="absolute bottom-2 right-2 bg-black bg-opacity-80 text-white text-xs px-2 py-1 rounded font-medium">
+				<span className="absolute bottom-2 right-2 rounded bg-black/80 px-2 py-1 text-xs font-medium text-white">
 					12:34
 				</span>
 			</div>
 
-			{/* Video Info */}
-			<div className="flex gap-3 px-0">
-				{/* Channel Avatar */}
-				<div className="w-9 h-9 rounded-full bg-gray-400 flex-shrink-0 mt-1" />
-
-				{/* Title, Channel, Stats */}
-				<div className="flex-1 min-w-0">
-					<h3 className="font-medium text-sm line-clamp-2 text-gray-900 group-hover:text-gray-700">
+			<div className="flex gap-3">
+				<div className="mt-1 h-9 w-9 shrink-0 overflow-hidden rounded-full bg-gray-400 sm:h-10 sm:w-10">
+					<img
+						src={video.avatar || FALLBACK_AVATAR}
+						alt={video.channel}
+						onError={(event) => {
+							event.currentTarget.src = FALLBACK_AVATAR
+						}}
+						className="h-full w-full object-cover"
+					/>
+				</div>
+				<div className="min-w-0 flex-1">
+					<h3 className="line-clamp-2 text-sm font-medium leading-5 text-gray-900 transition group-hover:text-gray-700 dark:text-gray-100 dark:group-hover:text-gray-300 sm:text-[0.95rem]">
 						{video.title}
 					</h3>
-					<p className="text-xs text-gray-600 mt-2 leading-tight">
+					<p className="mt-2 text-xs leading-5 text-gray-600 dark:text-gray-400 sm:text-sm">
 						{video.channel}
 					</p>
-					<p className="text-xs text-gray-600 leading-tight">
-						{formatViews(video.views || 0)} views • 2 days ago
+					<p className="text-xs leading-5 text-gray-600 dark:text-gray-400 sm:text-sm">
+						{formatViews(video.views || 0)} views • {publishedLabel}
 					</p>
 				</div>
 			</div>
