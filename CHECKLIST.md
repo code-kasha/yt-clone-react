@@ -164,14 +164,14 @@ Track every task before submission. Check off each item as it is completed.
 
 ## 📱 Responsive Design
 
-- [ ] Mobile layout (< 640px): 1-column grid, sidebar hidden by default
-- [ ] Tablet layout (640–1024px): 2-column grid, sidebar collapsible
-- [ ] Desktop layout (> 1024px): 4-column grid, sidebar visible
-- [ ] Header is responsive (search bar collapses on small screens)
-- [ ] Video Player page readable on mobile
-- [ ] Channel Page readable on mobile
-- [ ] Comment section usable on mobile
-- [ ] No horizontal overflow on any page
+- [✅] Mobile layout (< 640px): 1-column grid, sidebar hidden by default
+- [✅] Tablet layout (640–1024px): 2-column grid, sidebar collapsible
+- [✅] Desktop layout (> 1024px): 4-column grid, sidebar visible
+- [✅] Header is responsive (search bar collapses on small screens)
+- [✅] Video Player page readable on mobile
+- [✅] Channel Page readable on mobile
+- [✅] Comment section usable on mobile
+- [✅] No horizontal overflow on any page
 
 ---
 

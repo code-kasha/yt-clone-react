@@ -3,7 +3,7 @@ import Header from "../components/Header"
 import Sidebar from "../components/Sidebar"
 import FilterBar from "../components/FilterBar"
 import VideoGrid from "../components/VideoGrid"
-import { UIContext } from "../context/UIContext"
+import { UIContext } from "../context/UIContextValue"
 import useHomeVideos from "../hooks/useHomeVideos"
 
 export default function Home() {

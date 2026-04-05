@@ -16,7 +16,7 @@ import { MdOutlineSettings } from "react-icons/md"
 import { MdOutlineAccountCircle } from "react-icons/md"
 import { HiOutlineQuestionMarkCircle } from "react-icons/hi2"
 import { MdOutlineFeedback } from "react-icons/md"
-import { UIContext } from "../context/UIContext"
+import { UIContext } from "../context/UIContextValue"
 
 const mainItems = [
 	{ name: "Home", icon: HiOutlineHome, href: "/" },
@@ -78,14 +78,14 @@ export default function Sidebar() {
 		<>
 			<div
 				onClick={closeSidebar}
-				className={`fixed inset-0 top-14.25 z-30 bg-black/30 transition-opacity duration-300 dark:bg-black/50 md:hidden ${
+				className={`fixed inset-0 top-[57px] z-30 bg-black/30 transition-opacity duration-300 dark:bg-black/50 md:hidden ${
 					sidebarOpen
 						? "pointer-events-auto opacity-100"
 						: "pointer-events-none opacity-0"
 				}`}
 			/>
 			<aside
-				className={`fixed left-0 top-14.25 z-40 h-[calc(100vh-57px)] overflow-y-auto border-r border-gray-200 bg-white transition-[width,transform] duration-300 dark:border-gray-800 dark:bg-[#0f0f0f] ${
+				className={`fixed left-0 top-[57px] z-40 h-[calc(100vh-57px)] overflow-y-auto border-r border-gray-200 bg-white transition-[width,transform] duration-300 dark:border-gray-800 dark:bg-[#0f0f0f] ${
 					sidebarOpen
 						? "w-60 translate-x-0"
 						: "w-0 -translate-x-full md:w-24 md:translate-x-0"

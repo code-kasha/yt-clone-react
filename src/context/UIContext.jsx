@@ -1,6 +1,5 @@
-import { createContext, useEffect, useState } from "react"
-
-export const UIContext = createContext()
+import { useEffect, useState } from "react"
+import { UIContext } from "./UIContextValue"
 
 export function UIProvider({ children }) {
 	const [sidebarOpen, setSidebarOpen] = useState(() => {
@@ -19,7 +18,6 @@ export function UIProvider({ children }) {
 			setSidebarOpen(window.innerWidth >= 768)
 		}
 
-		handleResize()
 		window.addEventListener("resize", handleResize)
 
 		return () => window.removeEventListener("resize", handleResize)

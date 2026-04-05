@@ -6,8 +6,8 @@ import { HiOutlineSun } from "react-icons/hi2"
 import { IoSearchSharp } from "react-icons/io5"
 import { FaYoutube } from "react-icons/fa"
 import { Link, useNavigate } from "react-router-dom"
-import { AuthContext } from "../context/AuthContext"
-import { UIContext } from "../context/UIContext"
+import { AuthContext } from "../context/AuthContextValue"
+import { UIContext } from "../context/UIContextValue"
 
 export default function Header({ searchQuery = "", onSearchChange }) {
 	const navigate = useNavigate()
@@ -47,12 +47,14 @@ export default function Header({ searchQuery = "", onSearchChange }) {
 					>
 						<HiOutlineBars3 size={24} className="text-black dark:text-white" />
 					</button>
-					<div className="flex items-center gap-1.5">
-						<FaYoutube size={28} className="text-red-600" />
-						<span className="hidden text-lg font-bold text-black dark:text-white xxs:inline">
-							YouTube
-						</span>
-					</div>
+					<Link to="/">
+						<div className="flex items-center gap-1.5">
+							<FaYoutube size={28} className="text-red-600" />
+							<span className="hidden text-lg font-bold text-black dark:text-white xxs:inline">
+								YouTube
+							</span>
+						</div>
+					</Link>
 				</div>
 
 				<form

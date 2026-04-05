@@ -1,7 +1,7 @@
 import { useContext, useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import axiosInstance from "../api/axiosInstance"
-import { AuthContext } from "../context/AuthContext"
+import { AuthContext } from "../context/AuthContextValue"
 
 const INITIAL_FORM = {
 	email: "",

@@ -3,8 +3,8 @@ import { Navigate, useNavigate } from "react-router-dom"
 import axiosInstance from "../api/axiosInstance"
 import Header from "../components/Header"
 import Sidebar from "../components/Sidebar"
-import { AuthContext } from "../context/AuthContext"
-import { UIContext } from "../context/UIContext"
+import { AuthContext } from "../context/AuthContextValue"
+import { UIContext } from "../context/UIContextValue"
 
 const INITIAL_FORM = {
 	channelName: "",

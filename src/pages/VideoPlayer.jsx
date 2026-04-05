@@ -12,8 +12,8 @@ import {
 	FALLBACK_THUMBNAIL,
 	normalizeVideo,
 } from "../api/videos"
-import { AuthContext } from "../context/AuthContext"
-import { UIContext } from "../context/UIContext"
+import { AuthContext } from "../context/AuthContextValue"
+import { UIContext } from "../context/UIContextValue"
 
 const VIDEO_REQUEST_DEDUP_MS = 2000
 const videoRequestCache = new Map()
@@ -446,7 +446,7 @@ export default function VideoPlayer() {
 														to={`/video/${item.routeId || item.id}`}
 														className="group flex gap-3"
 													>
-														<div className="relative w-42 shrink-0 overflow-hidden rounded-xl bg-gray-300 dark:bg-[#272727]">
+														<div className="relative w-[168px] shrink-0 overflow-hidden rounded-xl bg-gray-300 dark:bg-[#272727]">
 															<img
 																src={item.thumbnail || FALLBACK_THUMBNAIL}
 																alt={item.title}

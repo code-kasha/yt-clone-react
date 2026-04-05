@@ -11,7 +11,7 @@ export default function VideoGrid({
 }) {
 	const loadMoreRef = useRef(null)
 	const gridClasses =
-		"mx-auto grid w-full max-w-[1600px] grid-cols-1 gap-x-4 gap-y-8 px-3 py-4 xxs:px-4 xs:grid-cols-2 sm:gap-x-5 sm:gap-y-10 sm:px-5 md:grid-cols-3 lg:py-6 xl:grid-cols-4"
+		"mx-auto grid w-full max-w-[1600px] grid-cols-1 gap-x-4 gap-y-8 px-3 py-4 xxs:px-4 sm:grid-cols-2 sm:gap-x-5 sm:gap-y-10 sm:px-5 lg:grid-cols-4 lg:py-6"
 
 	useEffect(() => {
 		if (!hasMore || isLoading || isLoadingMore || !onLoadMore) return

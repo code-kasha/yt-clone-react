@@ -4,8 +4,8 @@ import axiosInstance from "../api/axiosInstance"
 import Header from "../components/Header"
 import Sidebar from "../components/Sidebar"
 import { FALLBACK_AVATAR } from "../api/videos"
-import { AuthContext } from "../context/AuthContext"
-import { UIContext } from "../context/UIContext"
+import { AuthContext } from "../context/AuthContextValue"
+import { UIContext } from "../context/UIContextValue"
 
 const normalizeChannel = (channel) => ({
 	id: channel?._id || channel?.channelId || "",

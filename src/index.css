@@ -24,11 +24,13 @@
 
 html {
 	scroll-behavior: smooth;
+	overflow-x: hidden;
 }
 
 body {
 	background-color: #f9f9f9;
 	color: #030303;
+	overflow-x: hidden;
 	transition:
 		background-color 0.25s ease,
 		color 0.25s ease;
@@ -41,6 +43,7 @@ html.dark body {
 
 #root {
 	min-height: 100vh;
+	overflow-x: hidden;
 }
 
 @layer utilities {
