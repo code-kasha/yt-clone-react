@@ -1,4 +1,4 @@
-import { useContext, useEffect, useMemo, useState } from "react"
+import { useContext, useEffect, useMemo, useRef, useState } from "react"
 import { Link, Navigate } from "react-router-dom"
 import axiosInstance from "../api/axiosInstance"
 import Header from "../components/Header"
@@ -6,6 +6,7 @@ import Sidebar from "../components/Sidebar"
 import { FALLBACK_AVATAR } from "../api/videos"
 import { AuthContext } from "../context/AuthContextValue"
 import { UIContext } from "../context/UIContextValue"
+import usePageTitle from "../hooks/usePageTitle"
 
 const formatMemberSince = (date) => {
 	if (!date) return "Unknown"
@@ -26,37 +27,37 @@ export default function UserDetails() {
 	const [profile, setProfile] = useState(null)
 	const [loading, setLoading] = useState(true)
 	const [error, setError] = useState("")
-
-	useEffect(() => {
-		const previousTitle = document.title
-		document.title = "Your Profile - YouTube"
-
-		return () => {
-			document.title = previousTitle
-		}
-	}, [])
+	const isMountedRef = useRef(true)
+	usePageTitle("Your Profile - YouTube")
 
 	useEffect(() => {
 		if (!isAuthenticated || !token) return
 
-		setLoading(true)
-		setError("")
+		isMountedRef.current = true
 
+		// Load the current signed-in user's profile once auth state is available.
 		axiosInstance
 			.get("/auth/me")
 			.then(({ data }) => {
-				setProfile(data?.user || null)
+				if (isMountedRef.current) {
+					setProfile(data?.user || null)
+					setLoading(false)
+				}
 			})
 			.catch((fetchError) => {
-				console.error("Failed to load profile", fetchError)
-				setError(
-					fetchError.response?.data?.message ||
-						"Could not load your profile right now.",
-				)
+				if (isMountedRef.current) {
+					console.error("Failed to load profile", fetchError)
+					setError(
+						fetchError.response?.data?.message ||
+							"Could not load your profile right now.",
+					)
+					setLoading(false)
+				}
 			})
-			.finally(() => {
-				setLoading(false)
-			})
+
+		return () => {
+			isMountedRef.current = false
+		}
 	}, [isAuthenticated, token])
 
 	const channelsCount = useMemo(
@@ -101,6 +102,7 @@ export default function UserDetails() {
 									How you&apos;ll appear
 								</p>
 
+								{/* Top profile block mirrors the public-facing identity users see across the app. */}
 								<div className="mt-6 flex flex-col items-center text-center">
 									<div className="h-28 w-28 overflow-hidden rounded-full bg-gray-200 ring-4 ring-gray-100 dark:bg-[#272727] dark:ring-[#222]">
 										<img
@@ -149,6 +151,7 @@ export default function UserDetails() {
 									</div>
 								</div>
 
+								{/* Summary cards keep the most important account stats scannable on mobile. */}
 								<div className="mt-6 grid gap-4 sm:grid-cols-2">
 									<div className="rounded-2xl bg-gray-50 px-4 py-4 dark:bg-[#202020]">
 										<p className="text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">

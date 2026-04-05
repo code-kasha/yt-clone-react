@@ -1,297 +1,42 @@
-import { useContext, useEffect, useMemo, useState } from "react"
-import { BiDislike, BiLike } from "react-icons/bi"
-import { BiShare } from "react-icons/bi"
-import { BiBookmark } from "react-icons/bi"
-import { Link, useNavigate, useParams } from "react-router-dom"
-import axiosInstance from "../api/axiosInstance"
+import { useContext } from "react"
+import { BiBookmark, BiDislike, BiLike, BiShare } from "react-icons/bi"
+import { Link, useParams } from "react-router-dom"
+import { FALLBACK_AVATAR, FALLBACK_THUMBNAIL } from "../api/videos"
 import CommentSection from "../components/CommentSection"
 import Header from "../components/Header"
 import Sidebar from "../components/Sidebar"
-import {
-	FALLBACK_AVATAR,
-	FALLBACK_THUMBNAIL,
-	normalizeVideo,
-} from "../api/videos"
 import { AuthContext } from "../context/AuthContextValue"
 import { UIContext } from "../context/UIContextValue"
-
-const VIDEO_REQUEST_DEDUP_MS = 2000
-const videoRequestCache = new Map()
-
-const getEmbedUrl = (videoUrl) => {
-	if (!videoUrl) return ""
-
-	const embedParams = new URLSearchParams({
-		autoplay: "0",
-		controls: "1",
-		modestbranding: "1",
-		rel: "0",
-		playsinline: "1",
-		iv_load_policy: "3",
-	})
-
-	try {
-		const url = new URL(videoUrl)
-		const directVideoId = url.searchParams.get("v")
-		if (directVideoId) {
-			return `https://www.youtube.com/embed/${directVideoId}?${embedParams.toString()}`
-		}
-
-		if (url.hostname.includes("youtu.be")) {
-			const shortId = url.pathname.replace("/", "")
-			return shortId
-				? `https://www.youtube.com/embed/${shortId}?${embedParams.toString()}`
-				: ""
-		}
-
-		return videoUrl
-	} catch {
-		return videoUrl
-	}
-}
-
-const normalizeComments = (comments = []) =>
-	comments.map((comment) => ({
-		id: comment._id,
-		text: comment.text,
-		timestamp: comment.timestamp || comment.createdAt,
-		user: {
-			_id: comment.userId?._id || "",
-			username: comment.userId?.username || "Anonymous",
-			avatar: comment.userId?.avatar || "",
-		},
-	}))
-
-const getVideoRequest = (id) => {
-	const now = Date.now()
-	const cachedEntry = videoRequestCache.get(id)
-
-	if (cachedEntry && now - cachedEntry.createdAt < VIDEO_REQUEST_DEDUP_MS) {
-		return cachedEntry.promise
-	}
-
-	const request = axiosInstance.get(`/videos/${id}`)
-	videoRequestCache.set(id, {
-		promise: request,
-		createdAt: now,
-	})
-
-	request.finally(() => {
-		window.setTimeout(() => {
-			const latestEntry = videoRequestCache.get(id)
-			if (latestEntry?.promise === request) {
-				videoRequestCache.delete(id)
-			}
-		}, VIDEO_REQUEST_DEDUP_MS)
-	})
-
-	return request
-}
+import usePageTitle from "../hooks/usePageTitle"
+import useVideoPlayer from "../hooks/useVideoPlayer"
 
 export default function VideoPlayer() {
-	const navigate = useNavigate()
 	const { id } = useParams()
 	const { sidebarOpen } = useContext(UIContext)
 	const { user, isAuthenticated } = useContext(AuthContext)
-	const [video, setVideo] = useState(null)
-	const [comments, setComments] = useState([])
-	const [recommendedVideos, setRecommendedVideos] = useState([])
-	const [loading, setLoading] = useState(true)
-	const [error, setError] = useState("")
-	const [actionLoading, setActionLoading] = useState("")
-	const [commentError, setCommentError] = useState("")
-	const [commentBusyId, setCommentBusyId] = useState("")
+	const {
+		video,
+		embedUrl,
+		comments,
+		recommendedVideos,
+		loading,
+		error,
+		actionLoading,
+		commentError,
+		commentBusyId,
+		liked,
+		disliked,
+		handleReaction,
+		handleAddComment,
+		handleEditComment,
+		handleDeleteComment,
+	} = useVideoPlayer({
+		id,
+		user,
+		isAuthenticated,
+	})
 
-	useEffect(() => {
-		setLoading(true)
-		setError("")
-
-		getVideoRequest(id)
-			.then(({ data }) => {
-				const normalizedVideo = normalizeVideo(data?.video || {})
-				setVideo(normalizedVideo)
-			})
-			.catch((fetchError) => {
-				console.error("Failed to load video", fetchError)
-				setError(
-					fetchError.response?.data?.message ||
-						"Could not load this video right now.",
-				)
-			})
-			.finally(() => {
-				setLoading(false)
-			})
-	}, [id])
-
-	useEffect(() => {
-		setCommentError("")
-		axiosInstance
-			.get(`/comments/${id}`)
-			.then(({ data }) => {
-				setComments(normalizeComments(data?.comments || []))
-			})
-			.catch((fetchError) => {
-				console.error("Failed to load comments", fetchError)
-				setCommentError(
-					fetchError.response?.data?.message ||
-						"Could not load comments right now.",
-				)
-			})
-	}, [id])
-
-	useEffect(() => {
-		axiosInstance
-			.get("/videos", {
-				params: {
-					page: 1,
-					limit: 20,
-				},
-			})
-			.then(({ data }) => {
-				const videos = Array.isArray(data?.videos)
-					? data.videos.map(normalizeVideo)
-					: []
-				setRecommendedVideos(
-					videos.filter((item) => item.id !== id).slice(0, 12),
-				)
-			})
-			.catch((fetchError) => {
-				console.error("Failed to load recommendations", fetchError)
-				setRecommendedVideos([])
-			})
-	}, [id])
-
-	useEffect(() => {
-		if (!video?.title) return
-
-		const previousTitle = document.title
-		document.title = `${video.title} - YouTube`
-
-		return () => {
-			document.title = previousTitle
-		}
-	}, [video?.title])
-
-	const liked = useMemo(() => {
-		if (!user?.id || !video) return false
-		return video.likedBy?.includes(user.id)
-	}, [user?.id, video])
-
-	const disliked = useMemo(() => {
-		if (!user?.id || !video) return false
-		return video.dislikedBy?.includes(user.id)
-	}, [user?.id, video])
-
-	const handleReaction = async (type) => {
-		if (!isAuthenticated) {
-			navigate("/login")
-			return
-		}
-
-		setActionLoading(type)
-		try {
-			const { data } = await axiosInstance.put(`/videos/${id}/${type}`)
-
-			setVideo((previousVideo) => ({
-				...previousVideo,
-				likes: data?.video?.likes ?? previousVideo.likes,
-				dislikes: data?.video?.dislikes ?? previousVideo.dislikes,
-				likedBy: Array.isArray(data?.video?.likedBy)
-					? data.video.likedBy
-					: previousVideo.likedBy,
-				dislikedBy: Array.isArray(data?.video?.dislikedBy)
-					? data.video.dislikedBy
-					: previousVideo.dislikedBy,
-			}))
-		} catch (reactionError) {
-			console.error(`Failed to ${type} video`, reactionError)
-		} finally {
-			setActionLoading("")
-		}
-	}
-
-	const handleAddComment = async (text) => {
-		if (!isAuthenticated) {
-			navigate("/login")
-			return
-		}
-
-		setCommentBusyId("new")
-		setCommentError("")
-
-		try {
-			const { data } = await axiosInstance.post(`/comments/${id}`, {
-				text,
-			})
-
-			const newComment = normalizeComments([data?.comment]).at(0)
-			if (newComment) {
-				setComments((previousComments) => [newComment, ...previousComments])
-			}
-		} catch (commentAddError) {
-			console.error("Failed to add comment", commentAddError)
-			setCommentError(
-				commentAddError.response?.data?.message ||
-					"Could not add comment right now.",
-			)
-		} finally {
-			setCommentBusyId("")
-		}
-	}
-
-	const handleEditComment = async (commentToEdit, text) => {
-		setCommentBusyId(commentToEdit.id)
-		setCommentError("")
-
-		try {
-			const { data } = await axiosInstance.put(
-				`/comments/${commentToEdit.id}`,
-				{ text },
-			)
-
-			const updatedComment = normalizeComments([data?.comment]).at(0)
-			if (updatedComment) {
-				setComments((previousComments) =>
-					previousComments.map((comment) =>
-						comment.id === commentToEdit.id ? updatedComment : comment,
-					),
-				)
-			}
-		} catch (commentEditError) {
-			console.error("Failed to edit comment", commentEditError)
-			setCommentError(
-				commentEditError.response?.data?.message ||
-					"Could not update comment right now.",
-			)
-		} finally {
-			setCommentBusyId("")
-		}
-	}
-
-	const handleDeleteComment = async (commentToDelete) => {
-		const confirmed = window.confirm(
-			"Delete this comment? This action cannot be undone.",
-		)
-		if (!confirmed) return
-
-		setCommentBusyId(commentToDelete.id)
-		setCommentError("")
-
-		try {
-			await axiosInstance.delete(`/comments/${commentToDelete.id}`)
-			setComments((previousComments) =>
-				previousComments.filter((comment) => comment.id !== commentToDelete.id),
-			)
-		} catch (commentDeleteError) {
-			console.error("Failed to delete comment", commentDeleteError)
-			setCommentError(
-				commentDeleteError.response?.data?.message ||
-					"Could not delete comment right now.",
-			)
-		} finally {
-			setCommentBusyId("")
-		}
-	}
+	usePageTitle(video?.title ? `${video.title} - YouTube` : "YouTube")
 
 	return (
 		<div className="flex h-screen flex-col bg-white dark:bg-[#0f0f0f]">
@@ -306,7 +51,7 @@ export default function VideoPlayer() {
 					}`}
 				>
 					{loading ? (
-						<div className="mx-auto w-full max-w-275 px-3 py-6 xxs:px-4 sm:px-5">
+						<div className="mx-auto w-full max-w-[1100px] px-3 py-6 xxs:px-4 sm:px-5">
 							<div className="animate-pulse space-y-4">
 								<div className="aspect-video rounded-2xl bg-gray-300 dark:bg-[#272727]" />
 								<div className="h-8 w-2/3 rounded bg-gray-300 dark:bg-[#272727]" />
@@ -314,167 +59,167 @@ export default function VideoPlayer() {
 							</div>
 						</div>
 					) : error ? (
-						<div className="mx-auto flex w-full max-w-275 items-center justify-center px-3 py-16 xxs:px-4 sm:px-5">
+						<div className="mx-auto flex w-full max-w-[1100px] items-center justify-center px-3 py-16 xxs:px-4 sm:px-5">
 							<p className="text-sm text-red-600 dark:text-red-400">{error}</p>
 						</div>
 					) : video ? (
-						<>
-							<div className="mx-auto w-full max-w-400 px-3 py-4 xxs:px-4 sm:px-5">
-								<div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_360px] xl:items-start">
-									<div className="min-w-0">
-										<div className="overflow-hidden rounded-2xl bg-black shadow-sm">
-											<iframe
-												title={video.title}
-												src={getEmbedUrl(video.videoUrl)}
-												className="aspect-video w-full"
-												allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-												allowFullScreen
-											/>
-										</div>
-
-										<div className="mt-3 space-y-3">
-											<h1 className="text-xl font-bold leading-8 text-gray-900 dark:text-gray-100 sm:text-2xl">
-												{video.title}
-											</h1>
-
-											<div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-												<div className="flex items-center gap-3">
-													<div className="h-12 w-12 overflow-hidden rounded-full bg-gray-300 dark:bg-gray-700">
-														<img
-															src={video.avatar || FALLBACK_AVATAR}
-															alt={video.channel}
-															className="h-full w-full object-cover"
-														/>
-													</div>
-													<div className="min-w-0">
-														<Link
-															to={`/channel/${video.channelId}`}
-															className="block truncate text-base font-semibold text-gray-900 hover:underline dark:text-gray-100"
-														>
-															{video.channel}
-														</Link>
-														<p className="text-sm text-gray-500 dark:text-gray-400">
-															{video.views} views •{" "}
-															{video.publishedAt
-																? new Date(
-																		video.publishedAt,
-																	).toLocaleDateString()
-																: "Recently uploaded"}
-														</p>
-													</div>
-													<button
-														type="button"
-														className="ml-2 rounded-full bg-black px-4 py-2 text-sm font-medium text-white transition hover:bg-gray-800 dark:bg-white dark:text-[#121212] dark:hover:bg-gray-200"
-													>
-														Subscribe
-													</button>
-												</div>
-
-												<div className="flex flex-wrap gap-3">
-													<button
-														type="button"
-														onClick={() => handleReaction("like")}
-														disabled={actionLoading === "like"}
-														className={`flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition ${
-															liked
-																? "bg-blue-600 text-white hover:bg-blue-500"
-																: "bg-gray-200 text-gray-900 hover:bg-gray-300 dark:bg-[#272727] dark:text-gray-100 dark:hover:bg-[#333]"
-														}`}
-													>
-														<BiLike size={18} />
-														<span>{video.likes}</span>
-													</button>
-													<button
-														type="button"
-														onClick={() => handleReaction("dislike")}
-														disabled={actionLoading === "dislike"}
-														className={`flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition ${
-															disliked
-																? "bg-red-600 text-white hover:bg-red-500"
-																: "bg-gray-200 text-gray-900 hover:bg-gray-300 dark:bg-[#272727] dark:text-gray-100 dark:hover:bg-[#333]"
-														}`}
-													>
-														<BiDislike size={18} />
-														<span>{video.dislikes}</span>
-													</button>
-													<button
-														type="button"
-														className="flex items-center gap-2 rounded-full bg-gray-200 px-4 py-2 text-sm font-medium text-gray-900 transition hover:bg-gray-300 dark:bg-[#272727] dark:text-gray-100 dark:hover:bg-[#333]"
-													>
-														<BiShare size={18} />
-														<span>Share</span>
-													</button>
-													<button
-														type="button"
-														className="flex items-center gap-2 rounded-full bg-gray-200 px-4 py-2 text-sm font-medium text-gray-900 transition hover:bg-gray-300 dark:bg-[#272727] dark:text-gray-100 dark:hover:bg-[#333]"
-													>
-														<BiBookmark size={18} />
-														<span>Save</span>
-													</button>
-												</div>
-											</div>
-
-											<div className="rounded-2xl border border-gray-200 bg-white px-4 py-3 shadow-sm dark:border-gray-800 dark:bg-[#181818]">
-												<p className="text-sm leading-7 text-gray-700 dark:text-gray-300">
-													{video.description || "No description provided."}
-												</p>
-											</div>
-										</div>
-
-										<CommentSection
-											comments={comments}
-											currentUser={user}
-											isAuthenticated={isAuthenticated}
-											onAddComment={handleAddComment}
-											onEditComment={handleEditComment}
-											onDeleteComment={handleDeleteComment}
-											error={commentError}
-											busy={commentBusyId === "new"}
-											busyCommentId={commentBusyId}
+						<div className="mx-auto w-full max-w-[1600px] px-3 py-4 xxs:px-4 sm:px-5">
+							<div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_360px] xl:items-start">
+								{/* Main watch column: player, metadata, and comments. */}
+								<div className="min-w-0">
+									<div className="overflow-hidden rounded-2xl bg-black shadow-sm">
+										<iframe
+											title={video.title}
+											src={embedUrl}
+											className="aspect-video w-full"
+											allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+											allowFullScreen
 										/>
 									</div>
 
-									<div className="space-y-3 xl:sticky xl:top-20">
-										<div className="rounded-2xl bg-white p-3 shadow-sm dark:bg-[#181818]">
-											<h2 className="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
-												Up next
-											</h2>
-											<div className="mt-3 space-y-3">
-												{recommendedVideos.map((item) => (
+									<div className="mt-3 space-y-3">
+										<h1 className="text-xl font-bold leading-8 text-gray-900 dark:text-gray-100 sm:text-2xl">
+											{video.title}
+										</h1>
+
+										<div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+											<div className="flex items-center gap-3">
+												<div className="h-12 w-12 overflow-hidden rounded-full bg-gray-300 dark:bg-gray-700">
+													<img
+														src={video.avatar || FALLBACK_AVATAR}
+														alt={video.channel}
+														className="h-full w-full object-cover"
+													/>
+												</div>
+												<div className="min-w-0">
 													<Link
-														key={item.id}
-														to={`/video/${item.routeId || item.id}`}
-														className="group flex gap-3"
+														to={`/channel/${video.channelId}`}
+														className="block truncate text-base font-semibold text-gray-900 hover:underline dark:text-gray-100"
 													>
-														<div className="relative w-[168px] shrink-0 overflow-hidden rounded-xl bg-gray-300 dark:bg-[#272727]">
-															<img
-																src={item.thumbnail || FALLBACK_THUMBNAIL}
-																alt={item.title}
-																onError={(event) => {
-																	event.currentTarget.src = FALLBACK_THUMBNAIL
-																}}
-																className="aspect-video h-full w-full object-cover"
-															/>
-														</div>
-														<div className="min-w-0 pt-0.5">
-															<h3 className="line-clamp-2 text-[0.92rem] font-medium leading-5 text-gray-900 transition group-hover:text-gray-700 dark:text-gray-100 dark:group-hover:text-gray-300">
-																{item.title}
-															</h3>
-															<p className="mt-1 text-xs leading-4 text-gray-600 dark:text-gray-400">
-																{item.channel}
-															</p>
-															<p className="text-xs leading-4 text-gray-500 dark:text-gray-400">
-																{item.views} views
-															</p>
-														</div>
+														{video.channel}
 													</Link>
-												))}
+													<p className="text-sm text-gray-500 dark:text-gray-400">
+														{video.views} views •{" "}
+														{video.publishedAt
+															? new Date(
+																	video.publishedAt,
+																).toLocaleDateString()
+															: "Recently uploaded"}
+													</p>
+												</div>
+												<button
+													type="button"
+													className="ml-2 rounded-full bg-black px-4 py-2 text-sm font-medium text-white transition hover:bg-gray-800 dark:bg-white dark:text-[#121212] dark:hover:bg-gray-200"
+												>
+													Subscribe
+												</button>
 											</div>
+
+											<div className="flex flex-wrap gap-3">
+												<button
+													type="button"
+													onClick={() => handleReaction("like")}
+													disabled={actionLoading === "like"}
+													className={`flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition ${
+														liked
+															? "bg-blue-600 text-white hover:bg-blue-500"
+															: "bg-gray-200 text-gray-900 hover:bg-gray-300 dark:bg-[#272727] dark:text-gray-100 dark:hover:bg-[#333]"
+													}`}
+												>
+													<BiLike size={18} />
+													<span>{video.likes}</span>
+												</button>
+												<button
+													type="button"
+													onClick={() => handleReaction("dislike")}
+													disabled={actionLoading === "dislike"}
+													className={`flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition ${
+														disliked
+															? "bg-red-600 text-white hover:bg-red-500"
+															: "bg-gray-200 text-gray-900 hover:bg-gray-300 dark:bg-[#272727] dark:text-gray-100 dark:hover:bg-[#333]"
+													}`}
+												>
+													<BiDislike size={18} />
+													<span>{video.dislikes}</span>
+												</button>
+												<button
+													type="button"
+													className="flex items-center gap-2 rounded-full bg-gray-200 px-4 py-2 text-sm font-medium text-gray-900 transition hover:bg-gray-300 dark:bg-[#272727] dark:text-gray-100 dark:hover:bg-[#333]"
+												>
+													<BiShare size={18} />
+													<span>Share</span>
+												</button>
+												<button
+													type="button"
+													className="flex items-center gap-2 rounded-full bg-gray-200 px-4 py-2 text-sm font-medium text-gray-900 transition hover:bg-gray-300 dark:bg-[#272727] dark:text-gray-100 dark:hover:bg-[#333]"
+												>
+													<BiBookmark size={18} />
+													<span>Save</span>
+												</button>
+											</div>
+										</div>
+
+										<div className="rounded-2xl border border-gray-200 bg-white px-4 py-3 shadow-sm dark:border-gray-800 dark:bg-[#181818]">
+											<p className="text-sm leading-7 text-gray-700 dark:text-gray-300">
+												{video.description || "No description provided."}
+											</p>
+										</div>
+									</div>
+
+									<CommentSection
+										comments={comments}
+										currentUser={user}
+										isAuthenticated={isAuthenticated}
+										onAddComment={handleAddComment}
+										onEditComment={handleEditComment}
+										onDeleteComment={handleDeleteComment}
+										error={commentError}
+										busy={commentBusyId === "new"}
+										busyCommentId={commentBusyId}
+									/>
+								</div>
+
+								{/* Right rail keeps recommendations visible on wide screens, similar to YouTube's watch page. */}
+								<div className="space-y-3 xl:sticky xl:top-20">
+									<div className="rounded-2xl bg-white p-3 shadow-sm dark:bg-[#181818]">
+										<h2 className="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
+											Up next
+										</h2>
+										<div className="mt-3 space-y-3">
+											{recommendedVideos.map((item) => (
+												<Link
+													key={item.id}
+													to={`/video/${item.routeId || item.id}`}
+													className="group flex gap-3"
+												>
+													<div className="relative w-40 shrink-0 overflow-hidden rounded-xl bg-gray-300 dark:bg-[#272727]">
+														<img
+															src={item.thumbnail || FALLBACK_THUMBNAIL}
+															alt={item.title}
+															onError={(event) => {
+																event.currentTarget.src = FALLBACK_THUMBNAIL
+															}}
+															className="aspect-video h-full w-full object-cover"
+														/>
+													</div>
+													<div className="min-w-0 pt-0.5">
+														<h3 className="line-clamp-2 text-[0.92rem] font-medium leading-5 text-gray-900 transition group-hover:text-gray-700 dark:text-gray-100 dark:group-hover:text-gray-300">
+															{item.title}
+														</h3>
+														<p className="mt-1 text-xs leading-4 text-gray-600 dark:text-gray-400">
+															{item.channel}
+														</p>
+														<p className="text-xs leading-4 text-gray-500 dark:text-gray-400">
+															{item.views} views
+														</p>
+													</div>
+												</Link>
+											))}
 										</div>
 									</div>
 								</div>
 							</div>
-						</>
+						</div>
 					) : null}
 				</main>
 			</div>

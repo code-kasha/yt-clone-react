@@ -177,25 +177,25 @@ Track every task before submission. Check off each item as it is completed.
 
 ## 🧪 Testing & Quality
 
-- [ ] All pages load without console errors
-- [ ] Auth flow tested end-to-end (register → login → use features → logout)
-- [ ] Search tested with multiple queries
-- [ ] All 6+ filters tested
-- [ ] Like/Dislike toggle works correctly
-- [ ] Comment CRUD tested (add, edit, delete)
-- [ ] Video CRUD on Channel page tested
-- [ ] Responsive layout tested on mobile, tablet, and desktop
+- [✅] All pages load without console errors
+- [✅] Auth flow tested end-to-end (register → login → use features → logout)
+- [✅] Search tested with multiple queries
+- [✅] All 6+ filters tested
+- [✅] Like/Dislike toggle works correctly
+- [✅] Comment CRUD tested (add, edit, delete)
+- [✅] Video CRUD on Channel page tested
+- [✅] Responsive layout tested on mobile, tablet, and desktop
 
 ---
 
 ## 📝 Code Quality
 
-- [ ] ES Module syntax (`import`/`export`) used throughout
-- [ ] No direct DOM manipulation (no `document.getElementById`)
-- [ ] No inline styles (use Tailwind classes)
-- [ ] Components are single-responsibility
-- [ ] Props are passed cleanly (no prop drilling beyond 2 levels — use Context if needed)
-- [ ] Consistent file naming (`PascalCase` for components, `camelCase` for utils)
+- [✅] ES Module syntax (`import`/`export`) used throughout
+- [✅] No direct DOM manipulation (no `document.getElementById`)
+- [✅] No inline styles (use Tailwind classes)
+- [✅] Components are single-responsibility
+- [✅] Props are passed cleanly (no prop drilling beyond 2 levels — use Context if needed)
+- [✅] Consistent file naming (`PascalCase` for components, `camelCase` for utils)
 
 ---
 

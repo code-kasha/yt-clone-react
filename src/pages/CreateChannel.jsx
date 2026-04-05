@@ -1,10 +1,11 @@
-import { useContext, useEffect, useState } from "react"
+import { useContext, useState } from "react"
 import { Navigate, useNavigate } from "react-router-dom"
 import axiosInstance from "../api/axiosInstance"
 import Header from "../components/Header"
 import Sidebar from "../components/Sidebar"
 import { AuthContext } from "../context/AuthContextValue"
 import { UIContext } from "../context/UIContextValue"
+import usePageTitle from "../hooks/usePageTitle"
 
 const INITIAL_FORM = {
 	channelName: "",
@@ -12,6 +13,7 @@ const INITIAL_FORM = {
 	channelBanner: "",
 }
 
+// Keep validation local so the form can show fast inline feedback before the API round-trip.
 const validateForm = ({ channelName, description, channelBanner }) => {
 	const errors = {}
 
@@ -44,19 +46,12 @@ export default function CreateChannel() {
 	const [errors, setErrors] = useState({})
 	const [apiMessage, setApiMessage] = useState("")
 	const [submitting, setSubmitting] = useState(false)
+	usePageTitle("Create Channel - YouTube")
 
+	// Channel creation is only available to signed-in users.
 	if (!isAuthenticated) {
 		return <Navigate to="/login" replace />
 	}
-
-	useEffect(() => {
-		const previousTitle = document.title
-		document.title = "Create Channel - YouTube"
-
-		return () => {
-			document.title = previousTitle
-		}
-	}, [])
 
 	const handleChange = (event) => {
 		const { name, value } = event.target
@@ -91,6 +86,7 @@ export default function CreateChannel() {
 				channelBanner: formData.channelBanner.trim(),
 			})
 
+			// The API returns the new channel id, so we can send the user straight to their channel page.
 			const nextChannelId = data?.channel?._id || data?.channel?.channelId
 			if (nextChannelId) {
 				navigate(`/channel/${nextChannelId}`)
@@ -138,7 +134,11 @@ export default function CreateChannel() {
 								</p>
 							</div>
 
-							<form className="mt-6 space-y-5" onSubmit={handleSubmit} noValidate>
+							<form
+								className="mt-6 space-y-5"
+								onSubmit={handleSubmit}
+								noValidate
+							>
 								<div className="space-y-1.5">
 									<label
 										htmlFor="channelName"

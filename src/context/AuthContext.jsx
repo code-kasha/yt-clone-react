@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from "react"
 import { AuthContext } from "./AuthContextValue"
 
+// Decode the JWT payload client-side so we can restore auth state
+// and ignore expired tokens without making an extra request on boot.
 const decodeToken = (token) => {
 	try {
 		const payload = token.split(".")[1]
@@ -25,6 +27,7 @@ export function AuthProvider({ children }) {
 	const [token, setToken] = useState(() => {
 		if (typeof window === "undefined") return ""
 		const storedToken = window.localStorage.getItem("authToken") || ""
+		// Keep only tokens that still decode as valid on initial load.
 		return decodeToken(storedToken) ? storedToken : ""
 	})
 	const [user, setUser] = useState(() => {
@@ -37,8 +40,10 @@ export function AuthProvider({ children }) {
 		if (!decodedToken) return null
 		if (storedUser) {
 			try {
+				// Prefer the last user snapshot so the UI has avatar/username immediately.
 				return JSON.parse(storedUser)
 			} catch {
+				// Fall back to the minimal identity data embedded in the token.
 				return {
 					id: decodedToken.userId || decodedToken.id || "",
 					username: decodedToken.username || "",
@@ -61,6 +66,8 @@ export function AuthProvider({ children }) {
 	const isAuthenticated = Boolean(token && user && decodedToken)
 
 	useEffect(() => {
+		// This effect only mirrors auth state to localStorage.
+		// It intentionally avoids setting React state inside the effect body.
 		if (decodedToken) {
 			window.localStorage.setItem("authToken", token)
 		} else {
@@ -69,6 +76,8 @@ export function AuthProvider({ children }) {
 	}, [decodedToken, token])
 
 	useEffect(() => {
+		// Persist the richer user object separately from the token so
+		// the app can restore profile details without another login roundtrip.
 		if (user && decodedToken) {
 			window.localStorage.setItem("currentUser", JSON.stringify(user))
 		} else {

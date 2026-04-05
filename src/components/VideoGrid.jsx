@@ -10,6 +10,7 @@ export default function VideoGrid({
 	error,
 }) {
 	const loadMoreRef = useRef(null)
+	// Keep the feed layout consistent across home, channel, and search results views.
 	const gridClasses =
 		"mx-auto grid w-full max-w-[1600px] grid-cols-1 gap-x-4 gap-y-8 px-3 py-4 xxs:px-4 sm:grid-cols-2 sm:gap-x-5 sm:gap-y-10 sm:px-5 lg:grid-cols-4 lg:py-6"
 
@@ -26,6 +27,7 @@ export default function VideoGrid({
 				}
 			},
 			{
+				// Start loading a little before the user hits the bottom so scrolling feels seamless.
 				root: null,
 				rootMargin: "200px 0px",
 				threshold: 0.1,
@@ -72,6 +74,7 @@ export default function VideoGrid({
 			</div>
 
 			{hasMore ? (
+				// This sentinel is what the intersection observer watches to trigger the next batch.
 				<div
 					ref={loadMoreRef}
 					className="flex justify-center px-3 pt-2 text-sm text-gray-500 dark:text-gray-400 sm:px-5"

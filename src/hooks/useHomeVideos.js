@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
+import { useSearchParams } from "react-router-dom"
 import { fetchVideos, normalizeVideo, PAGE_SIZE } from "../api/videos"
 
 const filterVideosByCategory = (videos, category) => {
@@ -18,13 +19,17 @@ const filterVideosBySearch = (videos, query) => {
 const applyFilters = (videos, category, query) =>
 	filterVideosBySearch(filterVideosByCategory(videos, category), query)
 
+// Some backend responses can repeat items, so keep only one entry per normalized id.
 const dedupeVideos = (videos) =>
 	Array.from(new Map(videos.map((video) => [video.id, video])).values())
 
 export default function useHomeVideos() {
+	const [searchParams, setSearchParams] = useSearchParams()
 	const [allVideos, setAllVideos] = useState([])
 	const [activeCategory, setActiveCategory] = useState("All")
-	const [searchQuery, setSearchQuery] = useState("")
+	const [searchQuery, setSearchQuery] = useState(
+		() => searchParams.get("search") || "",
+	)
 	const [loading, setLoading] = useState(true)
 	const [hasMore, setHasMore] = useState(true)
 	const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
@@ -32,6 +37,7 @@ export default function useHomeVideos() {
 	const [visibleVideos, setVisibleVideos] = useState([])
 
 	const refreshVideos = useCallback(() => {
+		// The home feed fetches once, then category/search/pagination all happen client-side.
 		setLoading(true)
 		setError("")
 
@@ -59,10 +65,23 @@ export default function useHomeVideos() {
 	}, [refreshVideos])
 
 	useEffect(() => {
-		const filteredVideos = applyFilters(allVideos, activeCategory, searchQuery)
+		const queryFromUrl = searchParams.get("search") || ""
+		setSearchQuery((currentQuery) =>
+			currentQuery === queryFromUrl ? currentQuery : queryFromUrl,
+		)
+	}, [searchParams])
+
+	// Search and category filters compose so both controls can narrow the same feed.
+	const filteredVideos = useMemo(
+		() => applyFilters(allVideos, activeCategory, searchQuery),
+		[allVideos, activeCategory, searchQuery],
+	)
+
+	useEffect(() => {
+		// Infinite scroll reveals more of the already-filtered list instead of refetching pages.
 		setVisibleVideos(filteredVideos.slice(0, visibleCount))
 		setHasMore(filteredVideos.length > visibleCount)
-	}, [activeCategory, allVideos, searchQuery, visibleCount])
+	}, [filteredVideos, visibleCount])
 
 	const handleCategoryChange = (category) => {
 		if (category === activeCategory) return
@@ -73,6 +92,20 @@ export default function useHomeVideos() {
 	const handleSearchChange = (query) => {
 		setSearchQuery(query)
 		setVisibleCount(PAGE_SIZE)
+
+		// Persist the current search in the URL so header searches can navigate back into Home state.
+		const trimmedQuery = query.trim()
+		setSearchParams((currentParams) => {
+			const nextParams = new URLSearchParams(currentParams)
+
+			if (trimmedQuery) {
+				nextParams.set("search", trimmedQuery)
+			} else {
+				nextParams.delete("search")
+			}
+
+			return nextParams
+		})
 	}
 
 	const handleLoadMore = () => {

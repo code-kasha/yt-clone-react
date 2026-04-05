@@ -17,6 +17,8 @@ export default function CommentCard({
 	onDelete,
 	busy = false,
 }) {
+	// Keep a local draft so editing can happen inline without mutating the
+	// rendered comment text until the user explicitly saves.
 	const [isEditing, setIsEditing] = useState(false)
 	const [draftText, setDraftText] = useState(comment?.text || "")
 
@@ -25,6 +27,7 @@ export default function CommentCard({
 		if (!trimmedText) return
 
 		onEdit?.(comment, trimmedText)
+		setIsEditing(false)
 	}
 
 	return (
@@ -72,6 +75,8 @@ export default function CommentCard({
 							<button
 								type="button"
 								onClick={() => {
+									// Reset the draft back to the last persisted comment
+									// if the user cancels out of edit mode.
 									setDraftText(comment?.text || "")
 									setIsEditing(false)
 								}}
@@ -92,7 +97,10 @@ export default function CommentCard({
 					<div className="mt-3 flex gap-2">
 						<button
 							type="button"
-							onClick={() => setIsEditing(true)}
+							onClick={() => {
+								setDraftText(comment?.text || "")
+								setIsEditing(true)
+							}}
 							disabled={busy}
 							className="rounded-full bg-gray-200 px-3 py-1.5 text-xs font-medium text-gray-800 transition hover:bg-gray-300 dark:bg-[#272727] dark:text-gray-100 dark:hover:bg-[#353535]"
 						>

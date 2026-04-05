@@ -13,6 +13,7 @@ export default function VideoFormModal({
 	onClose,
 	onSubmit,
 }) {
+	// Keep the modal fully out of the tree when it is closed.
 	if (!open) return null
 
 	return (
@@ -38,6 +39,7 @@ export default function VideoFormModal({
 					</button>
 				</div>
 
+				{/* One shared form handles both upload and edit so the field layout stays consistent. */}
 				<form onSubmit={onSubmit} className="mt-5 space-y-4">
 					<div>
 						<label className="text-sm font-medium text-gray-800 dark:text-gray-200">
@@ -91,6 +93,7 @@ export default function VideoFormModal({
 								}`}
 								placeholder="https://www.youtube.com/watch?v=..."
 							/>
+							{/* The backend treats the source video as immutable after creation, so edit mode only allows metadata changes. */}
 							{formErrors.videoUrl ? (
 								<p className="mt-1 text-xs text-red-600 dark:text-red-400">
 									{formErrors.videoUrl}
@@ -151,6 +154,7 @@ export default function VideoFormModal({
 						</p>
 					) : null}
 
+					{/* Button labels reflect the current mode so users know whether they are creating or updating. */}
 					<div className="flex flex-col-reverse gap-3 pt-2 sm:flex-row sm:justify-end">
 						<button
 							type="button"

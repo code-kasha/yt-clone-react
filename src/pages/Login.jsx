@@ -8,6 +8,7 @@ const INITIAL_FORM = {
 	password: "",
 }
 
+// Validate locally first so obvious input issues never need an API round-trip.
 const validateForm = ({ email, password }) => {
 	const errors = {}
 
@@ -65,6 +66,7 @@ export default function Login() {
 				password: formData.password,
 			})
 
+			// Successful login updates the shared auth context before returning to the home feed.
 			login({
 				token: data.token,
 				user: data.user,
@@ -160,6 +162,7 @@ export default function Login() {
 					</button>
 				</form>
 
+				{/* Keep the auth flow connected so first-time users can jump straight to registration. */}
 				<p className="mt-6 text-center text-sm text-gray-600 dark:text-gray-400">
 					Don&apos;t have an account?{" "}
 					<Link

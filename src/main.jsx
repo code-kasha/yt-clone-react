@@ -5,11 +5,12 @@ import App from "./App.jsx"
 import { registerServiceWorker } from "./utils/sw-register"
 import { BrowserRouter } from "react-router-dom"
 
-// Register service worker for offline support and caching
+// Register the service worker once during startup so the app can support offline caching.
 registerServiceWorker()
 
 createRoot(document.getElementById("root")).render(
 	<StrictMode>
+		{/* BrowserRouter owns navigation/history for the whole app before App mounts any routes. */}
 		<BrowserRouter>
 			<App />
 		</BrowserRouter>

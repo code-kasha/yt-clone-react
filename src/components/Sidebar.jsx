@@ -76,21 +76,23 @@ export default function Sidebar() {
 
 	return (
 		<>
+			{/* Mobile overlay closes the drawer when users tap outside the sidebar. */}
 			<div
 				onClick={closeSidebar}
-				className={`fixed inset-0 top-[57px] z-30 bg-black/30 transition-opacity duration-300 dark:bg-black/50 md:hidden ${
+				className={`fixed inset-0 top-14.25 z-30 bg-black/30 transition-opacity duration-300 dark:bg-black/50 md:hidden ${
 					sidebarOpen
 						? "pointer-events-auto opacity-100"
 						: "pointer-events-none opacity-0"
 				}`}
 			/>
 			<aside
-				className={`fixed left-0 top-[57px] z-40 h-[calc(100vh-57px)] overflow-y-auto border-r border-gray-200 bg-white transition-[width,transform] duration-300 dark:border-gray-800 dark:bg-[#0f0f0f] ${
+				className={`fixed left-0 top-14.25 z-40 h-[calc(100vh-57px)] overflow-y-auto border-r border-gray-200 bg-white transition-[width,transform] duration-300 dark:border-gray-800 dark:bg-[#0f0f0f] ${
 					sidebarOpen
 						? "w-60 translate-x-0"
 						: "w-0 -translate-x-full md:w-24 md:translate-x-0"
 				}`}
 			>
+				{/* Expanded drawer on mobile and desktop-open state. */}
 				{sidebarOpen ? (
 					<>
 						<nav className="flex flex-col gap-1 p-3">
@@ -219,6 +221,7 @@ export default function Sidebar() {
 						</div>
 					</>
 				) : (
+					/* Collapsed rail stays visible from md and up so primary navigation remains accessible. */
 					<nav className="hidden h-full flex-col gap-2 px-2 py-4 md:flex">
 						{collapsedItems.map((item) => {
 							const Icon = item.icon

@@ -6,6 +6,7 @@ import Sidebar from "../components/Sidebar"
 import { FALLBACK_AVATAR } from "../api/videos"
 import { AuthContext } from "../context/AuthContextValue"
 import { UIContext } from "../context/UIContextValue"
+import usePageTitle from "../hooks/usePageTitle"
 
 const normalizeChannel = (channel) => ({
 	id: channel?._id || channel?.channelId || "",
@@ -38,45 +39,49 @@ export default function MyChannels() {
 	const [channels, setChannels] = useState([])
 	const [loading, setLoading] = useState(true)
 	const [error, setError] = useState("")
-
-	useEffect(() => {
-		const previousTitle = document.title
-		document.title = "My Channels - YouTube"
-
-		return () => {
-			document.title = previousTitle
-		}
-	}, [])
+	usePageTitle("My Channels - YouTube")
 
 	useEffect(() => {
 		if (!isAuthenticated || !user?.id) return
 
-		setLoading(true)
-		setError("")
+		let isMounted = true
 
-		axiosInstance
-			.get("/channels")
-			.then(({ data }) => {
+		const fetchChannels = async () => {
+			if (isMounted) setLoading(true)
+			if (isMounted) setError("")
+
+			try {
+				const { data } = await axiosInstance.get("/channels")
 				const allChannels = Array.isArray(data?.channels)
 					? data.channels.map(normalizeChannel)
 					: []
 
-				setChannels(
-					allChannels.filter(
-						(channel) => String(channel.owner.id) === String(user.id),
-					),
-				)
-			})
-			.catch((fetchError) => {
+				if (isMounted) {
+					// The API returns all channels, so this page narrows them down to the signed-in owner's set.
+					setChannels(
+						allChannels.filter(
+							(channel) => String(channel.owner.id) === String(user.id),
+						),
+					)
+				}
+			} catch (fetchError) {
 				console.error("Failed to load channels", fetchError)
-				setError(
-					fetchError.response?.data?.message ||
-						"Could not load your channels right now.",
-				)
-			})
-			.finally(() => {
-				setLoading(false)
-			})
+				if (isMounted) {
+					setError(
+						fetchError.response?.data?.message ||
+							"Could not load your channels right now.",
+					)
+				}
+			} finally {
+				if (isMounted) setLoading(false)
+			}
+		}
+
+		fetchChannels()
+
+		return () => {
+			isMounted = false
+		}
 	}, [isAuthenticated, user?.id])
 
 	const hasChannels = useMemo(() => channels.length > 0, [channels.length])
@@ -97,7 +102,7 @@ export default function MyChannels() {
 						sidebarOpen ? "md:ml-60" : "md:ml-24"
 					}`}
 				>
-					<div className="mx-auto w-full max-w-[1600px] px-3 py-6 xxs:px-4 sm:px-5">
+					<div className="mx-auto w-full max-w-400 px-3 py-6 xxs:px-4 sm:px-5">
 						<div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
 							<div>
 								<h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 sm:text-3xl">
@@ -136,6 +141,7 @@ export default function MyChannels() {
 								{error}
 							</div>
 						) : hasChannels ? (
+							/* Each card doubles as navigation back into the full channel page. */
 							<div className="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
 								{channels.map((channel) => (
 									<Link
@@ -195,7 +201,8 @@ export default function MyChannels() {
 									No channels yet
 								</h2>
 								<p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-									Create your first channel to start building your creator space.
+									Create your first channel to start building your creator
+									space.
 								</p>
 								<Link
 									to="/channel/create"

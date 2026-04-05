@@ -21,16 +21,19 @@ export default function Home() {
 
 	return (
 		<div className="flex h-screen flex-col bg-white dark:bg-[#0f0f0f]">
+			{/* Home owns the active search state so the header can filter the feed directly. */}
 			<Header searchQuery={searchQuery} onSearchChange={handleSearchChange} />
 
 			<div className="flex flex-1 overflow-hidden">
 				<Sidebar />
 
+				{/* The main feed shifts with the sidebar so the grid stays aligned across breakpoints. */}
 				<main
 					className={`flex min-w-0 flex-1 flex-col overflow-y-auto bg-gray-50 transition-[margin] duration-300 dark:bg-[#121212] ${
 						sidebarOpen ? "md:ml-60" : "md:ml-24"
 					}`}
 				>
+					{/* Category filters and the grid both read from the same hook-backed video state. */}
 					<FilterBar onCategoryChange={handleCategoryChange} />
 					<VideoGrid
 						videos={videos}

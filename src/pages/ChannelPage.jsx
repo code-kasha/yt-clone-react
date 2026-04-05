@@ -52,13 +52,14 @@ export default function ChannelPage() {
 			<div className="flex flex-1 overflow-hidden">
 				<Sidebar />
 
+				{/* The channel page shares the same header/sidebar shell as the home feed. */}
 				<main
 					className={`flex min-w-0 flex-1 flex-col overflow-y-auto bg-gray-50 transition-[margin] duration-300 dark:bg-[#121212] ${
 						sidebarOpen ? "md:ml-60" : "md:ml-24"
 					}`}
 				>
 					{loading ? (
-						<div className="mx-auto w-full max-w-[1600px] px-3 py-6 xxs:px-4 sm:px-5">
+						<div className="mx-auto w-full max-w-400 px-3 py-6 xxs:px-4 sm:px-5">
 							<div className="animate-pulse space-y-5">
 								<div className="h-44 rounded-2xl bg-gray-300 dark:bg-[#272727]" />
 								<div className="flex items-center gap-4">
@@ -71,11 +72,11 @@ export default function ChannelPage() {
 							</div>
 						</div>
 					) : error ? (
-						<div className="mx-auto flex w-full max-w-[1200px] items-center justify-center px-3 py-16 xxs:px-4 sm:px-5">
+						<div className="mx-auto flex w-full max-w-300 items-center justify-center px-3 py-16 xxs:px-4 sm:px-5">
 							<p className="text-sm text-red-600 dark:text-red-400">{error}</p>
 						</div>
 					) : channel ? (
-						<div className="mx-auto w-full max-w-[1600px] px-3 py-5 xxs:px-4 sm:px-5">
+						<div className="mx-auto w-full max-w-400 px-3 py-5 xxs:px-4 sm:px-5">
 							<ChannelHero
 								channel={channel}
 								isOwner={isOwner}
@@ -84,6 +85,7 @@ export default function ChannelPage() {
 								modalOpen={modalOpen}
 							/>
 
+							{/* Tabs are visual for now; the page currently focuses on the Videos section layout. */}
 							<div className="mt-6 border-b border-gray-200 dark:border-gray-800">
 								<div className="scrollbar-hide flex items-center gap-5 overflow-x-auto text-sm font-medium text-gray-600 dark:text-gray-400">
 									{CHANNEL_TABS.map((tab) => (
@@ -109,6 +111,7 @@ export default function ChannelPage() {
 								</div>
 							</div>
 
+							{/* Sorting happens client-side on the normalized channel video list from the hook. */}
 							<div className="mt-4 flex flex-wrap items-center gap-2">
 								{SORT_OPTIONS.map((option) => (
 									<button
@@ -153,6 +156,7 @@ export default function ChannelPage() {
 				</main>
 			</div>
 
+			{/* Owners reuse the same modal for both creating new videos and editing existing ones. */}
 			<VideoFormModal
 				open={modalOpen}
 				mode={formMode}

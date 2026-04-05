@@ -22,6 +22,7 @@ export default function ChannelVideoCard({
 	return (
 		<div className="group">
 			<div className="relative mb-3">
+				{/* The thumbnail remains the main navigation target to the watch page. */}
 				<Link
 					to={`/video/${video.routeId || video.id}`}
 					className="block overflow-hidden rounded-2xl bg-gray-300 dark:bg-[#272727]"
@@ -39,6 +40,8 @@ export default function ChannelVideoCard({
 				</Link>
 
 				{canManage ? (
+					/* Owner controls live on top of the thumbnail so creators can
+					   edit/delete without leaving the channel management view. */
 					<div className="absolute right-3 top-3 flex items-center gap-2">
 						<button
 							type="button"

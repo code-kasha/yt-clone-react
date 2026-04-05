@@ -8,6 +8,7 @@ const INITIAL_FORM = {
 	password: "",
 }
 
+// Mirror the backend rules here so users get immediate inline feedback while typing.
 const validateForm = ({ username, email, password }) => {
 	const errors = {}
 
@@ -71,6 +72,7 @@ export default function Register() {
 				email: formData.email.trim(),
 				password: formData.password,
 			})
+			// Registration hands off to the login page so auth always starts from one flow.
 			navigate("/login")
 		} catch (error) {
 			const responseErrors = error.response?.data?.errors || {}
@@ -185,6 +187,7 @@ export default function Register() {
 					</button>
 				</form>
 
+				{/* Returning users can switch straight into the login page from here. */}
 				<p className="mt-6 text-center text-sm text-gray-600 dark:text-gray-400">
 					Already have an account?{" "}
 					<Link

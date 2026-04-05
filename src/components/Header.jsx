@@ -5,25 +5,54 @@ import { HiOutlineMoon } from "react-icons/hi2"
 import { HiOutlineSun } from "react-icons/hi2"
 import { IoSearchSharp } from "react-icons/io5"
 import { FaYoutube } from "react-icons/fa"
-import { Link, useNavigate } from "react-router-dom"
+import { Link, useLocation, useNavigate } from "react-router-dom"
 import { AuthContext } from "../context/AuthContextValue"
 import { UIContext } from "../context/UIContextValue"
 
 export default function Header({ searchQuery = "", onSearchChange }) {
 	const navigate = useNavigate()
+	const location = useLocation()
 	const { toggleSidebar, darkMode, toggleTheme } = useContext(UIContext)
 	const { user, logout, isAuthenticated } = useContext(AuthContext)
 	const [mobileSearchOpen, setMobileSearchOpen] = useState(false)
+	const [localSearchQuery, setLocalSearchQuery] = useState(searchQuery)
 	const inputRef = useRef(null)
 
 	useEffect(() => {
+		setLocalSearchQuery(searchQuery)
+	}, [searchQuery])
+
+	useEffect(() => {
+		// When the compact mobile search view opens, focus the input immediately
+		// so the user can start typing without an extra tap.
 		if (mobileSearchOpen) {
 			inputRef.current?.focus()
 		}
 	}, [mobileSearchOpen])
 
+	const activeSearchQuery =
+		typeof onSearchChange === "function" ? searchQuery : localSearchQuery
+
+	const handleInputChange = (nextQuery) => {
+		if (typeof onSearchChange === "function") {
+			onSearchChange(nextQuery)
+			return
+		}
+
+		setLocalSearchQuery(nextQuery)
+	}
+
 	const handleSubmit = (event) => {
 		event.preventDefault()
+		const trimmedQuery = activeSearchQuery.trim()
+		const search = trimmedQuery
+			? `?search=${encodeURIComponent(trimmedQuery)}`
+			: ""
+
+		if (location.pathname !== "/" || location.search !== search) {
+			navigate(`/${search}`)
+		}
+
 		setMobileSearchOpen(false)
 	}
 
@@ -35,6 +64,7 @@ export default function Header({ searchQuery = "", onSearchChange }) {
 	return (
 		<header className="sticky top-0 z-50 border-b border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-[#0f0f0f]">
 			<div className="mx-auto flex w-full items-center justify-between gap-2 px-3 py-2 xxs:px-4 sm:gap-4 sm:px-5">
+				{/* Left side: sidebar toggle + brand. Hidden while mobile search takes over. */}
 				<div
 					className={`flex min-w-fit items-center gap-2 xxs:gap-3 ${
 						mobileSearchOpen ? "hidden" : "flex"
@@ -57,6 +87,7 @@ export default function Header({ searchQuery = "", onSearchChange }) {
 					</Link>
 				</div>
 
+				{/* Center search collapses into a full-width mobile search mode below `sm`. */}
 				<form
 					onSubmit={handleSubmit}
 					className={`min-w-0 flex-1 justify-center sm:px-4 ${
@@ -81,8 +112,8 @@ export default function Header({ searchQuery = "", onSearchChange }) {
 								ref={inputRef}
 								type="text"
 								placeholder="Search"
-								value={searchQuery}
-								onChange={(event) => onSearchChange?.(event.target.value)}
+								value={activeSearchQuery}
+								onChange={(event) => handleInputChange(event.target.value)}
 								className="min-w-0 flex-1 bg-transparent text-sm text-black outline-none placeholder:text-gray-500 dark:text-white dark:placeholder:text-gray-400"
 							/>
 							<button
@@ -99,6 +130,7 @@ export default function Header({ searchQuery = "", onSearchChange }) {
 					</div>
 				</form>
 
+				{/* Right side: mobile search trigger, theme toggle, and auth/profile actions. */}
 				<div
 					className={`min-w-fit items-center gap-1 xxs:gap-2 ${
 						mobileSearchOpen ? "hidden" : "flex"

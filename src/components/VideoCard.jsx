@@ -13,11 +13,13 @@ export default function VideoCard({ video }) {
 		: "Recently uploaded"
 
 	return (
+		/* The whole card acts as the click target so browsing the feed feels natural. */
 		<Link to={`/video/${video.routeId || video.id}`} className="group block cursor-pointer">
 			<div className="relative mb-3 aspect-video overflow-hidden rounded-2xl bg-gray-300 transition duration-300 group-hover:rounded-xl dark:bg-[#272727]">
 				<img
 					src={video.thumbnail || FALLBACK_THUMBNAIL}
 					alt={video.title}
+					// Broken remote thumbnails fall back to a stable placeholder instead of collapsing the card.
 					onError={(event) => {
 						event.currentTarget.src = FALLBACK_THUMBNAIL
 					}}
@@ -33,6 +35,7 @@ export default function VideoCard({ video }) {
 					<img
 						src={video.avatar || FALLBACK_AVATAR}
 						alt={video.channel}
+						// Avatar fallbacks keep the channel row visually consistent even with bad API data.
 						onError={(event) => {
 							event.currentTarget.src = FALLBACK_AVATAR
 						}}

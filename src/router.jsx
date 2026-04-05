@@ -1,5 +1,4 @@
-// router/router.jsx
-import { Routes, Route } from "react-router-dom"
+import { Route, Routes } from "react-router-dom"
 import ChannelPage from "./pages/ChannelPage"
 import CreateChannel from "./pages/CreateChannel"
 import Home from "./pages/Home"
@@ -12,6 +11,7 @@ import VideoPlayer from "./pages/VideoPlayer"
 function Router() {
 	return (
 		<Routes>
+			{/* Public routes for browsing, auth, and creator/profile flows. */}
 			<Route path="/" element={<Home />} />
 			<Route path="/login" element={<Login />} />
 			<Route path="/register" element={<Register />} />
