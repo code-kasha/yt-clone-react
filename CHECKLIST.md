@@ -201,9 +201,9 @@ Track every task before submission. Check off each item as it is completed.
 
 ## 📦 Git & Submission
 
-- [ ] Repository has at least **15 frontend commits**
-- [ ] Commits are atomic and descriptive (e.g., `feat: add video player page`)
-- [ ] `node_modules/` is in `.gitignore` and NOT pushed
-- [ ] `.env` is NOT pushed to GitHub
-- [ ] Production build tested with `npm run build`
-- [ ] Frontend README is complete and accurate
+- [✅] Repository has at least **15 frontend commits**
+- [✅] Commits are atomic and descriptive (e.g., `feat: add video player page`)
+- [✅] `node_modules/` is in `.gitignore` and NOT pushed
+- [✅] `.env` is NOT pushed to GitHub
+- [✅] Production build tested with `npm run build`
+- [✅] Frontend README is complete and accurate

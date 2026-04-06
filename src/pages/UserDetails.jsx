@@ -98,10 +98,6 @@ export default function UserDetails() {
 							</div>
 						) : profile ? (
 							<div className="w-full max-w-2xl rounded-3xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-[#181818] sm:p-8">
-								<p className="text-sm font-medium text-gray-500 dark:text-gray-400">
-									How you&apos;ll appear
-								</p>
-
 								{/* Top profile block mirrors the public-facing identity users see across the app. */}
 								<div className="mt-6 flex flex-col items-center text-center">
 									<div className="h-28 w-28 overflow-hidden rounded-full bg-gray-200 ring-4 ring-gray-100 dark:bg-[#272727] dark:ring-[#222]">
