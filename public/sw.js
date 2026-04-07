@@ -1,55 +1,44 @@
-const CACHE_NAME = "yt-clone-v1"
-const ASSETS_CACHE = "yt-clone-assets-v1"
-const API_CACHE = "yt-clone-api-v1"
+const CACHE_NAME = "yt-clone"
+const ASSETS_CACHE = "yt-clone-assets"
 
 // Files to precache
 const PRECACHE_URLS = ["/", "/index.html"]
 
-// Install event - cache precache URLs
+// ================= INSTALL =================
 self.addEventListener("install", (event) => {
-	console.log("[ServiceWorker] Installing...")
+	console.log("[SW] Installing...")
 	event.waitUntil(
-		caches.open(CACHE_NAME).then((cache) => {
-			console.log("[ServiceWorker] Precaching files")
-			return cache.addAll(PRECACHE_URLS)
-		}),
+		caches.open(CACHE_NAME).then((cache) => cache.addAll(PRECACHE_URLS)),
 	)
 	self.skipWaiting()
 })
 
-// Activate event - clean up old caches
+// ================= ACTIVATE =================
 self.addEventListener("activate", (event) => {
-	console.log("[ServiceWorker] Activating...")
+	console.log("[SW] Activating...")
 	event.waitUntil(
-		caches.keys().then((cacheNames) => {
-			return Promise.all(
-				cacheNames.map((cacheName) => {
-					if (
-						cacheName !== CACHE_NAME &&
-						cacheName !== ASSETS_CACHE &&
-						cacheName !== API_CACHE
-					) {
-						console.log("[ServiceWorker] Deleting old cache:", cacheName)
-						return caches.delete(cacheName)
+		caches.keys().then((names) =>
+			Promise.all(
+				names.map((name) => {
+					if (name !== CACHE_NAME && name !== ASSETS_CACHE) {
+						return caches.delete(name)
 					}
 				}),
-			)
-		}),
+			),
+		),
 	)
 	self.clients.claim()
 })
 
-// Fetch event - implement caching strategies
+// ================= FETCH =================
 self.addEventListener("fetch", (event) => {
 	const { request } = event
 	const url = new URL(request.url)
 
-	// Skip non-GET requests
-	if (request.method !== "GET") {
-		return
-	}
+	// ❌ Skip non-GET
+	if (request.method !== "GET") return
 
-	// Skip chrome extensions and websockets
+	// ❌ Skip extensions/websockets
 	if (
 		url.protocol === "chrome-extension:" ||
 		url.protocol === "ws:" ||
@@ -58,70 +47,75 @@ self.addEventListener("fetch", (event) => {
 		return
 	}
 
-	// API requests - Network first, fall back to cache
+	// ✅ IMPORTANT: NEVER CACHE API
 	if (url.pathname.startsWith("/api/")) {
-		event.respondWith(networkFirstStrategy(request, API_CACHE))
+		event.respondWith(fetch(request)) // direct network
 		return
 	}
 
-	// Assets (js, css, images) - Cache first, fall back to network
+	// ❌ Skip Google Fonts (fix your error)
+	if (url.hostname.includes("fonts.googleapis.com")) {
+		event.respondWith(fetch(request))
+		return
+	}
+
+	// ✅ Assets → Cache First
 	if (isAsset(request.url)) {
-		event.respondWith(cacheFirstStrategy(request, ASSETS_CACHE))
+		event.respondWith(cacheFirst(request))
 		return
 	}
 
-	// HTML and other requests - Network first, fall back to cache
-	event.respondWith(networkFirstStrategy(request, CACHE_NAME))
+	// ✅ HTML → Network First
+	event.respondWith(networkFirst(request))
 })
 
-// Cache first strategy: use cache if available, otherwise fetch from network
-async function cacheFirstStrategy(request, cacheName) {
+// ================= STRATEGIES =================
+
+async function cacheFirst(request) {
+	const cached = await caches.match(request)
+	if (cached) return cached
+
 	try {
-		const cached = await caches.match(request)
-		if (cached) {
-			console.log("[ServiceWorker] Returning from cache:", request.url)
-			return cached
-		}
-
 		const response = await fetch(request)
-		if (!response || response.status !== 200) {
-			return response
+		if (response && response.status === 200) {
+			const cache = await caches.open(ASSETS_CACHE)
+			cache.put(request, response.clone())
 		}
-
-		const cache = await caches.open(cacheName)
-		cache.put(request, response.clone())
 		return response
-	} catch (error) {
-		console.error("[ServiceWorker] Cache first strategy failed:", error)
-		return caches.match("/index.html")
+	} catch (err) {
+		console.error("[SW] cacheFirst failed:", err)
 	}
 }
 
-// Network first strategy: try network first, fall back to cache
-async function networkFirstStrategy(request, cacheName) {
+async function networkFirst(request) {
 	try {
 		const response = await fetch(request)
 
-		if (!response || response.status !== 200) {
-			return caches.match(request)
+		if (response && response.status === 200) {
+			const cache = await caches.open(CACHE_NAME)
+			cache.put(request, response.clone())
 		}
 
-		const cache = await caches.open(cacheName)
-		cache.put(request, response.clone())
 		return response
-	} catch (error) {
-		console.error("[ServiceWorker] Network first strategy failed:", error)
+	} catch (err) {
+		console.warn("[SW] network failed, trying cache:", request.url)
+
 		const cached = await caches.match(request)
-		if (cached) {
-			return cached
+		if (cached) return cached
+
+		// ONLY fallback to index.html for navigation requests
+		if (request.mode === "navigate") {
+			return caches.match("/index.html")
 		}
-		return caches.match("/index.html")
+
+		throw err
 	}
 }
 
-// Check if URL is an asset
+// ================= HELPERS =================
+
 function isAsset(url) {
-	const assetExtensions = [
+	return [
 		".js",
 		".css",
 		".png",
@@ -133,20 +127,5 @@ function isAsset(url) {
 		".woff",
 		".woff2",
 		".ttf",
-		".eot",
-	]
-	return assetExtensions.some((ext) => url.endsWith(ext))
+	].some((ext) => url.includes(ext))
 }
-
-// Handle push notifications (optional)
-self.addEventListener("push", (event) => {
-	if (event.data) {
-		const data = event.data.json()
-		const options = {
-			body: data.body,
-			icon: "/icon.png",
-			badge: "/badge.png",
-		}
-		event.waitUntil(self.registration.showNotification(data.title, options))
-	}
-})

@@ -114,6 +114,7 @@ export default function Login() {
 							type="email"
 							value={formData.email}
 							onChange={handleChange}
+							autoComplete="email"
 							className="w-full rounded-2xl border border-gray-300 bg-white px-4 py-3 text-sm text-gray-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 dark:border-gray-700 dark:bg-[#222] dark:text-gray-100 dark:focus:border-blue-400 dark:focus:ring-blue-950"
 							placeholder="Enter your email"
 						/>
@@ -137,6 +138,7 @@ export default function Login() {
 							type="password"
 							value={formData.password}
 							onChange={handleChange}
+							autoComplete="current-password"
 							className="w-full rounded-2xl border border-gray-300 bg-white px-4 py-3 text-sm text-gray-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 dark:border-gray-700 dark:bg-[#222] dark:text-gray-100 dark:focus:border-blue-400 dark:focus:ring-blue-950"
 							placeholder="Enter your password"
 						/>
