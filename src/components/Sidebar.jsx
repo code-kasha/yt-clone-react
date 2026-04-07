@@ -23,7 +23,7 @@ const mainItems = [
 	{
 		name: "Subscriptions",
 		icon: MdOutlineSubscriptions,
-		href: "",
+		href: "#",
 	},
 	{ name: "Library", icon: MdOutlineVideoLibrary, href: "/my-channels" },
 	{ name: "History", icon: MdOutlineHistory, href: "" },
