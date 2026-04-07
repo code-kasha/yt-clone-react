@@ -2,16 +2,12 @@
  * Register the service worker (production only)
  */
 export function registerServiceWorker() {
-	// Disable service worker in development to avoid conflicts with Vite HMR
-	if (import.meta.env.DEV) {
-		console.log("[App] Service Worker disabled in development mode")
-		return
-	}
-
 	if ("serviceWorker" in navigator) {
 		window.addEventListener("load", () => {
 			navigator.serviceWorker
-				.register("/sw.js")
+				.register("/sw.js", {
+					type: "module",
+				})
 				.then((registration) => {
 					console.log("[App] Service Worker registered:", registration)
 
