@@ -26,38 +26,38 @@ const mainItems = [
 		href: "#",
 	},
 	{ name: "Library", icon: MdOutlineVideoLibrary, href: "/my-channels" },
-	{ name: "History", icon: MdOutlineHistory, href: "" },
+	{ name: "History", icon: MdOutlineHistory, href: "#" },
 ]
 
 const extraMainItems = [
-	{ name: "Your videos", icon: MdOutlineVideoLibrary, href: "" },
-	{ name: "Watch later", icon: MdOutlineHistory, href: "" },
+	{ name: "Your videos", icon: MdOutlineVideoLibrary, href: "#" },
+	{ name: "Watch later", icon: MdOutlineHistory, href: "#" },
 ]
 
 const exploreItems = [
-	{ name: "Trending", icon: MdOutlineTrendingUp, href: "" },
-	{ name: "Music", icon: MdOutlineLibraryMusic, href: "" },
-	{ name: "Sports", icon: MdOutlineSportsBasketball, href: "" },
-	{ name: "Gaming", icon: MdOutlineMovieCreation, href: "" },
-	{ name: "News", icon: MdOutlineArticle, href: "" },
-	{ name: "Live", icon: MdOutlineRadio, href: "" },
+	{ name: "Trending", icon: MdOutlineTrendingUp, href: "#" },
+	{ name: "Music", icon: MdOutlineLibraryMusic, href: "#" },
+	{ name: "Sports", icon: MdOutlineSportsBasketball, href: "#" },
+	{ name: "Gaming", icon: MdOutlineMovieCreation, href: "#" },
+	{ name: "News", icon: MdOutlineArticle, href: "#" },
+	{ name: "Live", icon: MdOutlineRadio, href: "#" },
 ]
 
 const moreItems = [
-	{ name: "YouTube Studio", href: "" },
-	{ name: "YouTube Music", href: "" },
-	{ name: "YouTube Kids", href: "" },
+	{ name: "YouTube Studio", href: "#" },
+	{ name: "YouTube Music", href: "#" },
+	{ name: "YouTube Kids", href: "#" },
 ]
 
 const bottomItems = [
-	{ name: "Settings", icon: MdOutlineSettings, href: "/settings" },
-	{ name: "Help", icon: HiOutlineQuestionMarkCircle, href: "" },
-	{ name: "Send feedback", icon: MdOutlineFeedback, href: "" },
+	{ name: "Settings", icon: MdOutlineSettings, href: "#" },
+	{ name: "Help", icon: HiOutlineQuestionMarkCircle, href: "#" },
+	{ name: "Send feedback", icon: MdOutlineFeedback, href: "#" },
 ]
 
 const collapsedItems = [
-	{ name: "Home", icon: HiOutlineHome, href: "/home" },
-	{ name: "Shorts", icon: MdOutlinePlayCircle, href: "" },
+	{ name: "Home", icon: HiOutlineHome, href: "/" },
+	{ name: "Shorts", icon: MdOutlinePlayCircle, href: "#" },
 	{
 		name: "Channels",
 		icon: MdOutlineSubscriptions,
